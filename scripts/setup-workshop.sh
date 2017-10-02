@@ -46,32 +46,6 @@ function create_lab_infra_project() {
   oadm pod-network make-projects-global lab-infra
 }
 
-function clean_up_existing_infra() {
-  local _PROJECTS=
-  # delete projects
-  for i in `seq 0 100`; do
-    if [ $i -lt 10 ]; then
-      _PROJECTS+=" explore-0$i"
-    else
-      _PROJECTS+=" explore-$i"
-    fi
-  done
-
-  echo "Deleting projects: $_PROJECTS"
-  oc delete project $_PROJECTS
-
-  # delete roadshow guides
-  oc delete all -l app=labs -n lab-infra
-
-  # delete gitlab
-  oc delete all -l app=gitlab-ce -n lab-infra
-
-  sudo sed -i "s/maxProjects: 1/maxProjects: 3/g" /etc/origin/master/master-config.yaml
-  sudo systemctl restart atomic-openshift-master
-}
-
-
-
 # deploy Gogs
 function deploy_gogs() {
 oc process -f https://raw.githubusercontent.com/OpenShiftDemos/gogs-openshift-docker/rpm/openshift/gogs-persistent-template.yaml \
@@ -84,8 +58,6 @@ oc process -f https://raw.githubusercontent.com/OpenShiftDemos/gogs-openshift-do
   -n lab-infra | oc create -f - -n lab-infra
 }
 
-sleep 2
-
 function deploy_nexus() {
   oc process -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus2-persistent-template.yaml \
     -n lab-infra | oc create -f - -n lab-infra
@@ -94,14 +66,15 @@ function deploy_nexus() {
 
 function deploy_guides() {
   oc new-app --name=guides \
-    --docker-image=siamaksade/devops-workshop \
+    --docker-image=osevg/workshopper:ruby \
+    --env=WORKSHOPS_URLS=https://raw.githubusercontent.com/openshift-roadshow/devops-workshop-guides/master/_devops-workshop.yml \
+    --env=CONTENT_URL_PREFIX=https://raw.githubusercontent.com/openshift-roadshow/devops-workshop-guides/master \
     --env=OPENSHIFT_URL=$OPENSHIFT_MASTER \
     --env=OPENSHIFT_APPS_HOSTNAME=$OPENSHIFT_APPS_HOSTNAME \
     --env=OPENSHIFT_USER=userXX \
     --env=OPENSHIFT_PASSWORD=$USER_PASSWORD \
     --env=GIT_SERVER_URL=http://$GOGS_HOSTNAME \
     --env=GIT_SERVER_INTERNAL_URL=http://$GOGS_HOSTNAME \
-    # --env=GIT_SERVER_INTERNAL_URL=http://gogs.lab-infra.svc:3000 \
     --env=GIT_USER=userXX \
     --env=GIT_PASSWORD=$USER_PASSWORD \
     --env=PROJECT_SUFFIX=XX \
@@ -134,7 +107,7 @@ function generate_gogs_users() {
   rm -rf $_REPO_DIR
   mkdir $_REPO_DIR
   cd $_REPO_DIR
-  curl -sL -o ./coolstore.zip https://github.com/siamaksade/devops-labs-coolstore/archive/master.zip
+  curl -sL -o ./coolstore.zip https://github.com/openshift-roadshow/devops-workshop-labs/archive/master.zip
   unzip coolstore.zip
   cd devops-labs-coolstore-master/cart-spring-boot
   git init
@@ -194,7 +167,7 @@ function build_coolstore_images() {
   wait_while_empty "Nexus" 600 "oc get ep nexus -o yaml -n lab-infra | grep '\- addresses:'"
 
   # catalog service
-  oc new-app redhat-openjdk18-openshift:1.0~https://github.com/siamaksade/devops-labs-coolstore.git \
+  oc new-app redhat-openjdk18-openshift:1.0~https://github.com/openshift-roadshow/devops-workshop-labs.git \
         --context-dir=catalog-spring-boot \
         --name=catalog \
         --labels=app=coolstore \
@@ -204,7 +177,7 @@ function build_coolstore_images() {
 
 
   # gateway service
-  oc new-app redhat-openjdk18-openshift:1.0~https://github.com/siamaksade/devops-labs-coolstore.git \
+  oc new-app redhat-openjdk18-openshift:1.0~https://github.com/openshift-roadshow/devops-workshop-labs.git \
         --context-dir=gateway-vertx \
         --name=coolstore-gw \
         --labels=app=coolstore \
@@ -213,7 +186,7 @@ function build_coolstore_images() {
   oc cancel-build bc/coolstore-gw -n coolstore-images
 
   # inventory service
-  oc new-app redhat-openjdk18-openshift:1.0~https://github.com/siamaksade/devops-labs-coolstore.git \
+  oc new-app redhat-openjdk18-openshift:1.0~https://github.com/openshift-roadshow/devops-workshop-labs.git \
         --context-dir=inventory-wildfly-swarm \
         --name=inventory \
         --labels=app=coolstore \
@@ -222,7 +195,7 @@ function build_coolstore_images() {
   oc cancel-build bc/inventory -n coolstore-images
 
   # cart service
-  oc new-app redhat-openjdk18-openshift:1.0~https://github.com/siamaksade/devops-labs-coolstore.git \
+  oc new-app redhat-openjdk18-openshift:1.0~https://github.com/openshift-roadshow/devops-workshop-labs.git \
         --context-dir=cart-spring-boot \
         --name=cart \
         --labels=app=coolstore \
@@ -231,7 +204,7 @@ function build_coolstore_images() {
   oc cancel-build bc/cart -n coolstore-images
 
   # web ui
-  oc new-app nodejs:4~https://github.com/siamaksade/devops-labs-coolstore.git \
+  oc new-app nodejs:4~https://github.com/openshift-roadshow/devops-workshop-labs.git \
         --context-dir=web-nodejs \
         --name=web-ui \
         --labels=app=coolstore \
@@ -256,123 +229,7 @@ function build_coolstore_images() {
   oc tag coolstore-images/cart:latest         openshift/coolstore-cart:prod
 
   # add coolstore template
-  oc create -f https://raw.githubusercontent.com/siamaksade/devops-labs-coolstore/master/openshift/coolstore-deployment-template.yaml -n openshift
-}
-
-function set_default_resource_limits() {
-  rm -rf /tmp/project-template.yml
-  cat <<EOF > /tmp/project-template.yml
-apiVersion: v1
-kind: Template
-metadata:
-  name: project-request
-objects:
-- apiVersion: v1
-  kind: Project
-  metadata:
-    annotations:
-      openshift.io/description: \${PROJECT_DESCRIPTION}
-      openshift.io/display-name: \${PROJECT_DISPLAYNAME}
-      openshift.io/requester: \${PROJECT_REQUESTING_USER}
-    name: \${PROJECT_NAME}
-  spec: {}
-  status: {}
-- apiVersion: v1
-  kind: ResourceQuota
-  metadata:
-    name: \${PROJECT_NAME}-quota
-  spec:
-    hard:
-      persistentvolumeclaims: "5"
-      pods: 15
-      requests.storage: 5Gi
-      resourcequotas: 1
-- apiVersion: v1
-  kind: LimitRange
-  metadata:
-    creationTimestamp: null
-    name: \${PROJECT_NAME}-limits
-  spec:
-    limits:
-    - default:
-        cpu: 2000m
-        memory: 1048Mi
-      defaultRequest:
-        cpu: 100m
-        memory: 512Mi
-      max:
-        cpu: 4000m
-        memory: 2048Mi
-      min:
-        cpu: 50m
-        memory: 50Mi
-      type: Container
-- apiVersion: v1
-  groupNames:
-  - system:serviceaccounts:\${PROJECT_NAME}
-  kind: RoleBinding
-  metadata:
-    creationTimestamp: null
-    name: system:image-pullers
-    namespace: \${PROJECT_NAME}
-  roleRef:
-    name: system:image-puller
-  subjects:
-  - kind: SystemGroup
-    name: system:serviceaccounts:\${PROJECT_NAME}
-  userNames: null
-- apiVersion: v1
-  groupNames: null
-  kind: RoleBinding
-  metadata:
-    creationTimestamp: null
-    name: system:image-builders
-    namespace: \${PROJECT_NAME}
-  roleRef:
-    name: system:image-builder
-  subjects:
-  - kind: ServiceAccount
-    name: builder
-  userNames:
-  - system:serviceaccount:\${PROJECT_NAME}:builder
-- apiVersion: v1
-  groupNames: null
-  kind: RoleBinding
-  metadata:
-    creationTimestamp: null
-    name: system:deployers
-    namespace: \${PROJECT_NAME}
-  roleRef:
-    name: system:deployer
-  subjects:
-  - kind: ServiceAccount
-    name: deployer
-  userNames:
-  - system:serviceaccount:\${PROJECT_NAME}:deployer
-- apiVersion: v1
-  groupNames: null
-  kind: RoleBinding
-  metadata:
-    creationTimestamp: null
-    name: admin
-    namespace: \${PROJECT_NAME}
-  roleRef:
-    name: admin
-  subjects:
-  - kind: User
-    name: \${PROJECT_ADMIN_USER}
-  userNames:
-  - \${PROJECT_ADMIN_USER}
-parameters:
-- name: PROJECT_NAME
-- name: PROJECT_DISPLAYNAME
-- name: PROJECT_DESCRIPTION
-- name: PROJECT_ADMIN_USER
-- name: PROJECT_REQUESTING_USER
-EOF
-
-  oc delete template project-request -n default
-  oc create -f /tmp/project-template.yml -n default
+  oc create -f https://raw.githubusercontent.com/openshift-roadshow/devops-workshop-labs/master/openshift/coolstore-deployment-template.yaml -n openshift
 }
 
 ################################
@@ -381,10 +238,8 @@ EOF
 
 create_lab_infra_project; sleep 1
 deploy_gogs; sleep 1 
-clean_up_existing_infra; sleep 1
 deploy_nexus; sleep 1
 deploy_guides; sleep 1
-generate_gogs_users 2; sleep 1
-build_coolstore_images; sleep 1
-set_default_resource_limits
+generate_gogs_users 60; sleep 1
+build_coolstore_images;
 

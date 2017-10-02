@@ -1,0 +1,29 @@
+## Running the CI/CD Pipeline on Every Change
+
+In this lab you will learn about webhooks and how to automatically run the changes through the pipeline everytime there is a change in the application source repository.
+
+#### Background
+
+Manually starting the CI/CD pipeline does not really scale when there are more than a single developer working with the code repository. Continuous Delivery needs to ensure that every change (code or configuration) to the application is releasable and requires every change to go through the pipeline and verify if it can be release into production.
+
+Since manually click on *Start Pipeline* every time someone commits code or configuration to the Git repository is not possible across an entire development team, you can use Git Webhooks mechanism to trigger the pipeline (and any other builds in OpenShift) automatically every time there is a change in the Cart service Git repository.
+
+image::devops-webhook-diagram.png[Git Webhook]
+
+#### Adding a Webhook
+
+In the _Dev_ project, click on *Builds -> Pipelines* on the left sidebar menu and then on *cart-pipeline-git*. You can see the history of pipeline runs and how long the took to run. Click on *Configuration* tab where you can see the pipeline configuration such as which Git repository it uses to pull the Jenkinsfile, etc. Copy the *Generic Webhook URL* to the clipboard by clicking on the copy icon next to the URL. This is the webhook URL that the Git repository should invoke on every change in order to trigger the pipeline.
+
+Go to Gogs web by pointing your browser at Gogs URL and login using your credentials:
+
+CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
+
+* Gogs URL:  `{{GIT_SERVER_URL}}`
+* Username: `{{GIT_USER}}`
+* Password: `{{GIT_PASSWORD}}`
+
+Click on *cart-service* under *My Repositories* to go to the repository overview. Click on *Settings* and then *Webhooks*. Currently no webhooks are defined on _cart-service_ repository. Click on *Add Webhook* and choose *Gogs*. Paste the pipeline webhook URL you copied in previous steps into the *Payload URL* text field and click on *Add Webhook*.
+
+image::devops-webhook-gogs-add.png[Add Webhook]
+
+Now for every push to the *cart-service* Git repository, Gogs would make a REST call to OpenShift APIs at the given URL to trigger the pipeline. You can verify that the webhook works correctly by clicking on the webhook you just created from the list of webhooks and then on the *Test Delivery* button.

@@ -1,0 +1,90 @@
+## Pipeline Definition as Code
+
+In this lab you will get familiar with definine a pipeline as code and manage its versions via a version control system.
+
+#### Background
+Although it is convenient to embed a Jenkinsfile into an OpenShift Pipeline and edit it directly in the OpenShift Web Console, there is no history of changes made to the pipeline through the UI. Furthermore, switching back and forth between multiple versions of the pipeline becomes challenging with an embedded Jenkinsfile. Therefore, it is generally considered a best practice to create a Jenkinsfile and check it into the source control repository in order to manage its versions and history of changes applied to it.
+
+Using OpenShift Pipeline, you can store Jenkinsfiles in a Git repository and reference it in the JenkinsPipeline buildconfig. Whenever the pipeline starts running, OpenShift fetches the latest version the references Jenkinsfile from the Git repository and adjusts the pipeline steps accordingly. In this lab you will create an OpenShift Pipeline with the Jenkinsfile stored in a Git repository.
+
+Although CI/CD is a fairly new in many organizations, teams have been building Continuous Integration flows for a long time and have invested lots of time improving and refining that process. For Java projects, the CI flow generally moves around building the application JAR/WAR/EAR, running the unit-tests suits and integration tests and if successful, releasing the application binaries into a repository manager like Sonatype Nexus and Artifactory. In this lab, you will modify the pipeline in order to extend existing CI processes and build upon the Maven build and test flow that exists in many development teams.
+
+The following diagram shows the pipeline stages. For the sake simplicity, pushing the artifacts to an artifact repository is not included in this pipeline however you can include that using the https://jenkins.io/doc/pipeline/steps/nexus-artifact-uploader/[Nexus Artifact Uploader Plugin] for Sonatype Nexus and https://jenkins.io/doc/pipeline/steps/artifactory/#artifactoryupload-upload-artifacts[Artifactory Plugin] for Artifactory.
+
+image::devops-pipeline-scm-diagram.png[Pipeline Diagram]
+
+#### Pipeline from Git Repository
+
+Let’s start with cloning the `cart-service` Git repository where you will store the `Jenkinsfile`:
+
+CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
+
+[source,shell]
+----
+$ cd
+$ git clone {{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git
+$ cd cart-service
+$ touch Jenkinsfile
+----
+
+Open the created `Jenkinsfile` in a text editor and paste the following pipeline definition in the editor, and then save the `Jenkinsfile`:
+
+CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
+
+[source,shell]
+----
+node('maven') {
+  stage('Build App') {
+    git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
+    sh "mvn clean package -s src/main/config/settings.xml"
+  }
+  stage('Integration Test') {
+    sh "mvn verify -s src/main/config/settings.xml"
+  }
+  stage('Build Image') {
+    sh "oc start-build cart --from-file=target/cart.jar --follow"
+  }
+  stage('Deploy') {
+    openshiftDeploy(deploymentConfig: 'cart')
+    openshiftVerifyDeployment(deploymentConfig: "cart", replicaCount: 1, verifyReplicaCount: true)
+  }
+  stage('Component Test') {
+    sleep 10
+    sh "curl -s -X POST http://cart:8080/api/cart/dummy/666/1"
+    sh "curl -s http://cart:8080/api/cart/dummy | grep 'Dummy Product'"
+  }
+}
+----
+
+You need to push the Jenkinsfile to the Git repository in order to make it available on the Git server. Enter your Git username and password if asked:
+
+CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
+
+* Username: `{{GIT_USER}}`
+* Password: `{{GIT_PASSWORD}}`
+
+[source,shell]
+----
+$ git add Jenkinsfile
+$ git commit -m "Added cart pipeline"
+$ git push origin master
+----
+
+You can now create an OpenShift Pipeline and refer the pipelines Git repository to pull the Jenkinsfile and execute it
+
+[source,shell]
+----
+$ oc new-app . --name=cart-pipeline-git --strategy=pipeline
+----
+
+Due to an issue in OCP 3.5, a pipeline builds gets started and then gets stuck. Cancel the pipeline build and start again:
+
+[source,shell]
+----
+$ oc cancel-build bc/cart-pipeline-git
+----
+
+Click on *Builds -> Pipelines* on the left sidebar menu and then click on *Start Pipeline* button on the right side of 
+the *cart-pipeline-git*. A new instance of the pipeline starts running using your Jenkinsfile in the Git repository.
+
+image::devops-pipeline-scm-started.png[Pipeline from Git Repository]

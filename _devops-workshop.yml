@@ -1,0 +1,29 @@
+id: "devops"
+name: "DevOps Workshop with OpenShift"
+
+vars:
+  OPENSHIFT_URL: "https://192.168.99.100:8443"
+  OPENSHIFT_APPS_HOSTNAME: "192.168.99.100.nip.io"
+  OPENSHIFT_USER: "userXX"
+  OPENSHIFT_PASSWORD: "openshift3"
+  OPENSHIFT_DOCS_BASE: "https://docs.openshift.com/container-platform/3.5"
+  GIT_SERVER_URL: "http://gogs-lab-infra.192.168.99.100.nip.io"
+  GIT_SERVER_INTERNAL_URL: http://gogs.lab-infra.svc:3000
+  GIT_SERVER_TYPE: "gogs"
+  GIT_USER: "userXX"
+  GIT_PASSWORD: "openshift3"
+  PROJECT_SUFFIX: "XX"
+  
+modules:
+  activate:
+  - devops-intro
+  - devops-explore-openshift
+  - devops-deployment-envs
+  - devops-simple-pipeline
+  - devops-pipeline-scm
+  - devops-promotion
+  - devops-webhook
+  - devops-zerodowntime-manual
+  - devops-zerodowntime-automated
+  - devops-deploy-jenkins
+  - devops-custom-slave

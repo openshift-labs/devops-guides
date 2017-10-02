@@ -1,0 +1,35 @@
+modules:
+  devops-intro:
+    name: DevOps Introduction
+  devops-explore-openshift:
+    name: Explore OpenShift
+  devops-deployment-envs:
+    name: Deployment Environments
+  devops-simple-pipeline:
+    name: Creating a Simple CI/CD Pipeline
+    requires:
+      - devops-deployment-envs
+  devops-pipeline-scm:
+    name: Pipeline Definition as Code
+    requires:
+      - devops-deployment-envs
+  devops-promotion:
+    name: Application Promotion Between Environments
+    requires:
+      - devops-pipeline-scm
+  devops-webhook:
+    name: Running the CI/CD Pipeline on Every Change
+    requires:
+      - devops-promotion
+  devops-zerodowntime-manual:
+    name: Zero-Downtime Deployment to Production
+    requires:
+      - devops-webhook
+  devops-zerodowntime-automated:
+    name: Automated Zero-Downtime Deployment with CI/CD Pipelines
+    requires:
+      - devops-zerodowntime-manual
+  devops-deploy-jenkins:
+    name: Deploying Jenkins Manually
+  devops-custom-slave:
+    name: Creating Custom Jenkins Slave Pods

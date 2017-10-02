@@ -1,0 +1,58 @@
+## Deploying Jenkins Manually
+
+In this lab you will learn how to deploy a Jenkins server manually on OpenShift.
+
+#### Background
+
+In previous labs, you used the auto-provisioning capability of OpenShift to deploy a Jenkins server automatically when you created a CI/CD pipeline using the certified Jenkins container image which is provided by OpenShift.
+
+Although very useful, sometimes you might want to have more control over Jenkins deployment and where it will be deployed. In those scenarios, you can disable the {{OPENSHIFT_DOCS_BASE}}/install_config/configuring_pipeline_execution.html[auto-provisioning] feature and deploy Jenkins manually using the provided templates or with other means.
+
+#### Deploy Jenkins
+
+Go to OpenShift Web Console, click on the logo to see the list of projects. Create a new project for Jenkins by clicking on *New Project* in OpenShift Web Console
+
+* Name: `ci-{{PROJECT_SUFFIX}}`
+* Display Name: `CI/CD Infra`
+
+Click on the *Add to project* button. Then, scroll down to the *Technologies* section and click on *Continuous Integration & Deployment*:
+
+image::devops-jenkins-catalog.png[OpenShift Catalog]
+
+The two available templates deploy the Jenkins server but differ in their storage strategy, which affects whether or not the Jenkins content persists across a pod restart. A pod may be restarted when it is moved to another node, or when an update of the deployment configuration triggers a redeployment:
+
+* _Jenkins Ephemeral_ uses ephemeral storage. On pod restart, all data is lost. This template is useful for development or testing only.
+* _Jenkins Persistent_ uses a persistent volume store. Data survives a pod restart. To use a persistent volume store, the cluster administrator must define a persistent volume pool.
+
+For this lab, click on *Jenkins Ephemeral* template:
+
+image::devops-jenkins-templates.png[Jenkins Templates]
+
+You can customize the Jenkins properties such as service name, admin password, memory allocation, etc through the parameters in the web console. We can leave all of the default values, so just click on *Create* to deploy Jenkins.
+
+OpenShift deploys a Jenkins pod and also creates a service and route for the deployed container:
+
+image::devops-jenkins-containers.png[Jenkins Containers]
+
+Click on the Jenkins route in order to open the Jenkins Console. You will again need to accept the certificate. The Jenkins image that is provided by Red Hat uses an OAuth integration with OpenShift.
+
+image::devops-jenkins-login.png[Jenkins Login]
+
+Click *Login with OpenShift* and you will be taken to the OpenShift login screen. Use your OpenShift credentials and log in. You will then be prompted to allow Jenkins service account to access your account information:
+
+* Username: `{{OPENSHIFT_USER}}`
+* Password: `{{OPENSHIFT_PASSWORD}}`
+
+image::devops-jenkins-oauth.png[Jenkins OAuth Access]
+
+Click *Allow selected permissions*.
+
+In order to use this Jenkins server to perform actions on _Dev_ and _Prod_ projects, you need to assign the Jenkins service account edit role in the _Dev_ and _Prod_ projects.
+
+[source,shell]
+----
+$ oc policy add-role-to-user edit system:serviceaccount:ci-{{PROJECT_SUFFIX}}:jenkins -n dev-{{PROJECT_SUFFIX}}
+$ oc policy add-role-to-user edit system:serviceaccount:ci-{{PROJECT_SUFFIX}}:jenkins -n prod-{{PROJECT_SUFFIX}}
+----
+
+Your Jenkins server is ready now.

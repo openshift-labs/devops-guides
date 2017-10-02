@@ -1,0 +1,122 @@
+## Creating a Simple CI/CD Pipeline
+
+In this lab you will learn about OpenShift pipelines and create your first pipeline on the platform.
+
+#### Background
+
+OpenShift has built-in support for CI/CD pipelines by allowing developers to define a https://jenkins.io/solutions/pipeline/[Jenkins pipeline] for execution by Jenkins automation engine. The build can be started, monitored, and managed by OpenShift in the same way as any other build types e.g. S2I.
+Pipeline workflows are defined in a Jenkinsfile, either embedded directly in the build configuration, or supplied in a Git repository and referenced by the build configuration. In this lab, you will create a pipeline using the embedded scenario.
+
+The first time a project defines a build configuration using a pipeline strategy, OpenShift instantiates a Jenkins server to execute the pipeline. This Jenkins server is based on a {{OPENSHIFT_DOCS_BASE}}/using_images/other_images/jenkins.html[certified Jenkins container image] which is provided by OpenShift and has the necessary plug-ins pre-configured. Subsequent pipeline configurations in the project share this Jenkins server. Furthermore, if user has already created a Jenkins server, the same Jenkins server is used for executing the pipelines.
+
+Note that OpenShift can also use a Jenkins engine running outside the OpenShift platform (e.g. on a separate VM or on AWS EC2) for executing the pipelines. For further details refer to the {{OPENSHIFT_DOCS_BASE}}/using_images/other_images/jenkins.html[OpenShift Pipeline Jenkins Plugin] docs.
+
+Jenkinsfile is a text file that contains the definition of a Jenkins Pipeline and is created using a https://jenkins.io/doc/book/pipeline/syntax/[scripted or declarative syntax] in Groovy language. Although an understanding of Groovy is helpful for building pipelines, it is not a requirement in order to work with Pipeline. The following shows a basic pipeline using the Jenkinsfile scripted syntax which takes the code from the Git repository, builds the code and then runs the integration tests against it:
+
+image::devops-simple-pipeline-diagram.png[Simple CI/CD Pipeline]
+
+[source,shell]
+----
+node('maven') {
+  stage('clone') {
+    git url: '{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git'
+  }
+  stage('build') {
+    sh "mvn clean package"
+  }
+  stage('tests') {
+    sh "mvn verify"
+  }
+}
+----
+
+Running builds, especially large builds, frequently requires a lot of resources and quite soon surpass the available resources on the Jenkins server. Jenkins supports a master-slave architecture in order to be able to scale and run many builds and pipelines simultaneously. A slave is a Jenkins worker instance that is configured to offload build jobs (e.g. pipeline execution) from the master. In a master-slave setup, a number of slave instances are configured for the Jenkins master and the master distributes running builds between the slaves instances based on the build tools and others configurations available on each slave instance.
+
+The Jenkins certified image on OpenShift is pre-configured to {{OPENSHIFT_DOCS_BASE}}/using_images/other_images/jenkins.html#using-the-jenkins-kubernetes-plug-in-to-run-jobs[dynamically create Jenkins slave containers] when running OpenShift pipelines. The `node('maven') {...}` statement instructs Jenkins to dynamically deploy a Jenkins slave container which is configured for running Apache Maven builds and execute the pipeline on that container. Dynamic provisioning of the Jenkins slave containers allows running many builds in parallel on OpenShift without overloading the Jenkins master.
+
+Although one can use OpenShift CLI in the pipeline definition to interact with OpenShift, OpenShift Pipelines also provide a set of easy to use building blocks that simplify performing actions against OpenShift deployments. The following shows a simple pipeline that triggers an S2I build for building a NodeJS application and then triggers a deployment to deploy the application container image:
+
+[source,shell]
+----
+node('nodejs') {
+  stage('build') {
+    openshiftBuild(buildConfig: 'nodeapp')
+  }
+  stage('deploy') {
+    openshiftDeploy(deploymentConfig: 'nodeapp')
+  }
+}
+----
+
+#### Creating an OpenShift Pipeline
+
+Now let’s create an OpenShift Pipeline that builds and deploys the Cart service that was deployed in the _Dev_ project in the previous lab. This pipeline has three stages: _Build_, _Deploy_ and _Test_. The _Build_ stage triggers the Cart service S2I build in order to get the latest version of the source code from the source repository and build a docker container image form it. The _Deploy_ stage deploys the built container image to a container and the Test stage runs a smoke test to make sure the Cart service is up and running.
+
+image::devops-simple-pipeline-diagram-s2i.png[Simple CI/CD Pipeline with S2I]
+
+The following is a OpenShift Pipeline in YAML format which has a Jenkinsfile script embedded in it.
+
+[source,shell]
+----
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: cart-pipeline
+spec:
+  strategy:
+    jenkinsPipelineStrategy:
+      jenkinsfile: |-
+        node('maven') {
+          stage('Build') {
+            openshiftBuild(buildConfig: 'cart', showBuildLogs: 'true')
+          }
+          stage('Deploy') {
+            openshiftDeploy(deploymentConfig: 'cart')
+            openshiftVerifyDeployment(deploymentConfig: "cart", replicaCount: 1, verifyReplicaCount: true)
+          }
+          stage('Test') {
+            sh "curl -s -X POST http://cart:8080/api/cart/dummy/666/1"
+            sh "curl -s http://cart:8080/api/cart/dummy | grep 'Dummy Product'"
+          }
+        }
+    type: JenkinsPipeline
+----
+
+Notice the URL for referring to the Cart service in the _Dev_ environment. {{OPENSHIFT_DOCS_BASE}}/architecture/additional_concepts/networking.html[OpenShift has a built-in DNS] so that the services can be reached by the service DNS, regardless of the external URL. This simplifies referring to services since the service DNS in an environment does not change. The URL pattern for services is `<service>.<pod_namespace>.svc`.
+
+Click on *Add to project* in the _Dev_ project and then *Import YAML/JSON*. Paste the above YAML script in the text field and then click on *Create*.
+
+Click on *Overview* in the OpenShift Web Console, and see that a Jenkins server container is being deployed in the _Dev_ project.
+
+image::devops-simple-pipeline-jenkins-autoprovision.png[Jenkins Auto-provisioning]
+
+When you deployed Cart service, the deployment is configured to automatically initiate a new deployment everytime a new version of the Cart container image is available. When using pipelines, you might want the pipeline to control when a deployment should happen independent of whether an updated Cart container image is available. In order to do that, you can change the automatic deployment to manual on the Cart deploymentconfig using OpenShift CLI:
+
+CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
+
+[source,shell]
+----
+$ oc project dev-{{PROJECT_SUFFIX}}
+$ oc set triggers dc cart --manual
+----
+
+All set. Let’s give the Cart pipeline a try! Click on *Builds -> Pipelines* on the left sidebar menu and then click on *Start Pipeline* button on the right side of *cart-pipeline*. A new instance of the pipeline starts running. 
+
+image::devops-simple-pipeline-started.png[OpenShift Pipeline]
+
+Click on *View Log* to see the pipeline logs as it’s being executed. The link takes you to the Jenkins Pipeline Job that is created and managed by OpenShift for executing this pipeline. Since the security certificates used for securing your Jenkins server are self-generated and self-signed, your browser will not trust them by default and will show a security warning. In Chrome browser, click on *ADVANCED* and then *Proceed to ... (unsafe)* to trust the certificates. In Firefox browser, click on *Advanced* button, then *Add Exception...* and then confirm trusting the certificate by click on *Confirm Security Exception*.
+
+Although Jenkins can use its own authorization, the Jenkins images in OpenShift is configured by default to integrate with and use OpenShift OAuth authentication. Log in into Jenkins using your OpenShift credentials:
+
+* User: `{{OPENSHIFT_USER}}`
+* Password: `{{OPENSHIFT_PASSWORD}}`
+
+After login, you will be redirected to the pipeline job logs
+
+image::devops-simple-pipeline-logs.png[Pipeline Logs]
+
+After a little while, the Cart pipeline completes successfully, all green.
+
+image::devops-simple-pipeline-complete.png[OpenShift Pipeline]
+
+Congratulations! You just created and ran your first CI/CD pipeline. Welcome to the world of DevOps!

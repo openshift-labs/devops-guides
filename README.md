@@ -26,6 +26,3 @@ by deploy the lab guides, Gogs server, Nexus, creating Git repositories, etc.
 $ oc login -u system:admin
 $ bash <(curl -sL https://raw.githubusercontent.com/openshift-roadshow/devops-workshop-guides/master/scripts/setup-workshop.sh)
 ```
-
-NOTE: This script assumes there are a number of OpenShift users generated on the cluster with 
-the format `user00, user01, ...` and `openshift3` as password.

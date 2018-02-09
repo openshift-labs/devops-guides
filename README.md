@@ -2,7 +2,7 @@
 
 The DevOps Workshop provides full-stack and DevOps engineers an introduction to OpenShift and containers and how it can be used to build fully automated end-to-end deployment pipelines using advanced deployments techniques like rolling deploys and blue-green deployment.
 
-The lab application used in this workshop is available at https://github.com/openshift-roadshow/devops-workshop-labs
+The lab application used in this workshop is available at https://github.com/openshift-labs/devops-labs
 
 # Agenda
 * DevOps Introduction
@@ -24,5 +24,5 @@ by deploy the lab guides, Gogs server, Nexus, creating Git repositories, etc.
 
 ```
 $ oc login -u system:admin
-$ bash <(curl -sL https://raw.githubusercontent.com/openshift-roadshow/devops-workshop-guides/master/scripts/setup-workshop.sh)
+$ bash <(curl -sL https://raw.githubusercontent.com/openshift-labs/devops-guides/master/scripts/setup-workshop.sh)
 ```

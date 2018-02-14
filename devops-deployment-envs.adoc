@@ -64,7 +64,7 @@ image::devops-envs-cart-newapp.png[Deploy Cart Service]
 Click on *Show advanced options for source, routes, builds, and deployments* to review advanced options for setting memory and cpu limits, environment variables, scaling and more when deploying an application. In this lab, similar to most development teams a Maven artifact repository (e.g. Sonatype Nexus and Artifactory) is used for managing Maven artifacts. Add the following environment variable under *Build Configuration* to specify the Maven repository manager URL to be used during the build phase:
 
 * Name: `MAVEN_MIRROR_URL`
-* Value: `http://nexus.lab-infra.svc:8081/content/groups/public/`
+* Value: `{{NEXUS_URL}}`
 
 Note that the Maven repository manager URL is an internal URL and is not accessible externally. Click on *Create* button and then on *Continue to overview*.
 
@@ -98,7 +98,7 @@ There are multiple ways to check a container liveness and readiness. You can def
 
 image::devops-envs-cart-healthchecks.png[Create Cart Service]
 
-Wait till the Cart service is re-deployed with the new health check configurations and then verify that the Cart service is functioning by pointing your browser to the Cart service REST endpoint: `http://cart-dev-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}/health`
+Wait till the Cart service is re-deployed with the new health check configurations and then verify that the Cart service is functioning by pointing your browser to the Cart service REST endpoint.
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
@@ -106,7 +106,7 @@ Alternatively, you can use the `curl` command to verify that the Cart service is
 
 [source,shell]
 ----
-$ curl http://cart-dev-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}/health
+$ curl http://{{CART_ROUTE}}/health
 
 {"status":"UP","diskSpace":{"status":"UP","total":10725883904,"free":9970741248,"threshold":10485760},"refreshScope":{"status":"UP"},"hystrix":{"status":"UP"}}
 ----
@@ -132,7 +132,7 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 ----
 $ oc new-app redhat-openjdk18-openshift:1.0~{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git \
     --name=cart \
-    --build-env=MAVEN_MIRROR_URL=http://nexus.lab-infra.svc:8081/content/groups/public/
+    --build-env=MAVEN_MIRROR_URL={{NEXUS_URL}}
 
 --> Found image bc310f6 (5 weeks old) in image stream "openshift/redhat-openjdk18-openshift" under tag "latest" for "redhat-openjdk18-openshift"
     Java Applications

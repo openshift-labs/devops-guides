@@ -129,25 +129,17 @@ You can also expose the `cart-blue` and `cart-green` services as their own dedic
 $ oc expose svc/cart-blue
 $ oc expose svc/cart-green
 $ oc get routes
-
-NAME         HOST/PORT                               SERVICES
-cart         cart-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}         cart-blue(100%),cart-green(0%)
-cart-blue    cart-blue-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}    cart-blue  
-cart-green   cart-green-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}   cart-green
-catalog      catalog-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}      catalog
-coolstore-gw gw-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}           coolstore-gw
-web-ui       web-ui-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}       web-ui
 ----
 
 Verify the routes are working using the `curl` command:
 
-CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
+CAUTION: Replace the urls with routes in your project
 
 [source,shell]
 ----
-$ curl http://cart-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}/api/cart/dummy
-$ curl http://cart-green-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}/api/cart/dummy
-$ curl http://cart-blue-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}/api/cart/dummy
+$ curl http://{{CART_ROUTE}}/api/cart/dummy
+$ curl http://{{CART_BLUE_ROUTE}}/api/cart/dummy
+$ curl http://{{CART_GREEN_ROUTE}}/api/cart/dummy
 ----
 
 Showtime! Let’s perform your first blue/green deployment. Point your browser to Git server web URL and log in (you should be already logged in by now!) with your credentials:
@@ -200,9 +192,11 @@ image::devops-zerodowntime-green-deploy.png[Cart Green Deployment]
 
 After deployment is ready, verify that the new minimum order for free shipping is working correctly in the green container by adding 2 smart watches to the test shopping cart:
 
+CAUTION: Replace the Cart route with routes in your project
+
 [source,shell]
 ----
-$ curl -X POST http://cart-green-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}/api/cart/FOO/444434/2
+$ curl -X POST http://{{CART_GREEN_ROUTE}}/api/cart/FOO/444434/2
 {"cartItemTotal":48.0,"cartItemPromoSavings":0.0,"shippingTotal":0.0,"shippingPromoSavings":-4.99,"cartTotal":52.99,"shoppingCartItemList":[{"price":24.0,"quantity":2,"promoSavings":0.0,"product":{"itemId":"444434","name":"Pebble Smart Watch","desc":"Smart glasses and smart watches are perhaps two of the most exciting developments in recent years. ","price":24.0}}]}
 ----
 

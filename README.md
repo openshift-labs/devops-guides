@@ -17,14 +17,14 @@ The lab application used in this workshop is available at https://github.com/ope
 * Deploying Jenkins Manually
 * Creating Custom Jenkins Slave Pods
 
+
 # Workshop Guides
 
 You can deploy the workshop guides on OpenShift using the provided template:
 ```
-$ oc new-app -f openshift/template.yml \
-  --param= \
-  --param= \
+$ oc new-app -f openshift/guides-template.yml --param=OPENSHIFT_MASTER=$(oc whoami --show-server) 
 ```
+
 
 # Prepare Workshop
 
@@ -35,3 +35,4 @@ by deploy the lab guides, Gogs server, Nexus, creating Git repositories, etc.
 $ oc login -u system:admin
 $ bash <(curl -sL https://raw.githubusercontent.com/openshift-labs/devops-guides/master/openshift/setup-workshop.sh)
 ```
+

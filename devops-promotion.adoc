@@ -33,7 +33,9 @@ In the _Prod_ project, click on *Add to project* and then search for coolstore t
 
 image::devops-promotion-coolstore-template.png[CoolStore Template]
 
-Click on the *coolstore* template. Specify the *Hostname Suffix* with replacing your OpenShift master IP address in the following: `prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}`
+Click on the *coolstore* template. 
+
+If you remember, the Cart route hostname was generated for you in the *Cart Dev* project with the format: `cart-dev-{{PROJECT_SUFFIX}}.<HOSTNAME>`. Specify the *Hostname Suffix* in the form by replacing `cart-dev-{{PROJECT_SUFFIX}}` in that generated format with `prod-{{PROJECT_SUFFIX}}`, so that the value of *Hostname Suffix* would be `prod-{{PROJECT_SUFFIX}}.<HOSTNAME>`
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 

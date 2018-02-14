@@ -110,9 +110,11 @@ Click on *Commit Changes* button to commit the new shipping promotion rule to th
 
 After deployment is ready, verify that the new minimum order for free shipping is working correctly in the inactive container by adding 1 smartwatch to the test shopping cart :
 
+CAUTION: Replace the Cart route with routes in your project
+
 [source,shell]
 ----
-$ curl -X POST http://cart-blue-prod-{{PROJECT_SUFFIX}}.{{OPENSHIFT_APPS_HOSTNAME}}/api/cart/FOO/444434/1
+$ curl -X POST http://{{CART_BLUE_ROUTE}}/api/cart/FOO/444434/1
 {"cartItemTotal":24.0,"cartItemPromoSavings":0.0,"shippingTotal":0.0,"shippingPromoSavings":-2.99,"cartTotal":24.0,"shoppingCartItemList":[{"price":24.0,"quantity":1,"promoSavings":0.0,"product":{"itemId":"444434","name":"Pebble Smart Watch","desc":"Smart glasses and smart watches are perhaps two of the most exciting developments in recent years. ","price":24.0}}]}
 ----
 

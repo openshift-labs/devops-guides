@@ -5,8 +5,8 @@ In this lab you will learn about deployment environments in software delivery li
 #### Background
 A deployment environment describes a distinct space for an application to run during a particular stage of a CI/CD pipeline. Typical environments include development, test, stage, and production, for example. In this lab you will create _Dev_ and _Prod_ deployment environments for the CoolStore application which is deployed throughout this session:
 
-* _Dev Environment_: this environment is used during development of the Cart service and every change made by developers gets deployed into this environment. Other services e.g. Cart and Inventory would have also their own dedicated _Dev_ environments which allows the developers to write code and test their service without disrupting other teams. If the changes made pass the automated tests, the code will be deployed into the _Prod_ environment.
-* _Production Environment_: the live environment for the entire _CoolStore_ webshop with all services deployed and serving requests to customers. Any interruption in this environment would directly affect the customers.
+* *Dev Environment*: this environment is used during development of the Cart service and every change made by developers gets deployed into this environment. Other services e.g. Cart and Inventory would have also their own dedicated _Dev_ environments which allows the developers to write code and test their service without disrupting other teams. If the changes made pass the automated tests, the code will be deployed into the _Prod_ environment.
+* *Production Environment*: the live environment for the entire _CoolStore_ webshop with all services deployed and serving requests to customers. Any interruption in this environment would directly affect the customers.
 
 A _Project_ in OpenShift is a mechanism to scope applications in a cluster and is the central vehicle by which access to resources is managed. A project allows users to organize and manage their applications in isolation from other users. Users must be given access to projects by administrators, or if allowed to create projects, automatically have access to their own projects. Granular access control and network traffic policies for projects in OpenShift makes them a suitable way for modeling deployment environments that fulfil the collaboration, networking and isolation requirements.
 
@@ -17,14 +17,14 @@ Let’s start with with creating the _Dev_ deployment environment and deploying 
 
 #### Create Project via OpenShift Web Console
 
-In OpenShift Web Console, click on the *New Project* button in order to create a new project, enter the following details and click on *Create* button:
+In OpenShift Web Console, click on the *Create Project* button in order to create a new project, enter the following details and click on *Create* button:
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
 * Name: `dev-{{PROJECT_SUFFIX}}`
 * Display Name: `Cart Dev`
 
-image::devops-envs-create-dev.png[Create Dev Project]
+image::devops-envs-create-dev.png[Create Dev Project, width=360]
 
 The Dev deployment project for the Cart service is created now and is ready for the Cart service to be deployed. 
 
@@ -46,13 +46,13 @@ S2I can also take application binaries such as JAR, WAR or EAR files as input an
 
 If you already have a process in-place for building docker images, OpenShift allows you to point to the ready docker images and deploy them as is on the platform.
 
-In this lab, you will use the S2I mechanism for building the Cart service from source code. Since Cart service is based on Spring Boot, you only need the Java language runtime for running this service and therefore you will use the certified OpenJDK application runtime which is provided in OpenShift out-of-the-box. Click on *Add to project* button to open the service catalog. The catalog shows the list of available language and application runtimes as well as templates. A template describes how to build, configure and deploy a set of containers in a reproducible manner. OpenShift templates simplify composing complex multi-container applications and makes it easy to recreate and configure complete applications from scratch by deploying a template.
+In this lab, you will use the S2I mechanism for building the Cart service from source code. Since Cart service is based on Spring Boot, you only need the Java language runtime for running this service and therefore you will use the certified OpenJDK application runtime which is provided in OpenShift out-of-the-box. Click on *Browse Catalog* to open the service catalog. The catalog shows the list of available language and application runtimes, services as well as templates. A template describes how to build, configure and deploy a set of containers in a reproducible manner. OpenShift templates simplify composing complex multi-container applications and makes it easy to recreate and configure complete applications from scratch by deploying a template.
 
-Enter _jdk_ in the text field in order to find the OpenJDK 1.8 language runtime, and then click on *redhat-openjdk18-openshift*.
+Enter _jdk_ in the text field in order to find the *Red Hat OpenJDK 1.8* language runtime, and then click on the one that shows https://www.oracle.com/java/duke.html[duke, the java mascot].
 
 image::devops-envs-catalog-jdk.png[OpenJDK Base Image]
 
-Now that you have chosen the Java language runtime, you can enter the URL to the Cart service application source code to specify it as an input to the S2I process. Enter the following in the text fields:
+Now that you have chosen the Java language runtime, you can enter the URL to the Cart service application source code to specify it as an input to the S2I process. Click *Next* and enter the following in the text fields:
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
@@ -61,22 +61,20 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 image::devops-envs-cart-newapp.png[Deploy Cart Service]
 
-Click on *Show advanced options for source, routes, builds, and deployments* to review advanced options for setting memory and cpu limits, environment variables, scaling and more when deploying an application. In this lab, similar to most development teams a Maven artifact repository (e.g. Sonatype Nexus and Artifactory) is used for managing Maven artifacts. Add the following environment variable under *Build Configuration* to specify the Maven repository manager URL to be used during the build phase:
+Click on *advanced options* to review advanced options for setting memory and cpu limits, environment variables, scaling and more when deploying an application. In this lab, similar to most development teams a Maven artifact repository (e.g. Sonatype Nexus and Artifactory) is used for managing Maven artifacts. Add the following environment variable under *Build Configuration* to specify the Maven repository manager URL to be used during the build phase:
 
 * Name: `MAVEN_MIRROR_URL`
 * Value: `{{NEXUS_URL}}`
 
-Note that the Maven repository manager URL is an internal URL and is not accessible externally. Click on *Create* button and then on *Continue to overview*.
+Note that the Maven repository manager URL is an internal URL and is not accessible externally. Click on *Create* button and then on *Continue to the project overview.*.
 
 All required resources are created in order to build and deploy the Cart service in the Dev project. OpenShift provides an out-of-the-box load-balancer which is automatically updated to route traffic to Cart service when the container is deployed and ready to receive traffic.
-
-In order to make the Cart service available externally, you have to associate the service with an {{OPENSHIFT_DOCS_BASE}}/architecture/core_concepts/routes.html[externally-reachable] host name. You can do that simply by clicking on *Create Route* link on the right-side of the Cart service. You can modify the route URL by specify the route name or use a custom hostname as well as enabling SSL, etc but in this lab you will use the default values. Click on *Create* to create the route.
 
 In the project overview, the Cart service S2I build process is running to build first the application JAR file and then a docker image by layering the JAR file on the OpenJDK base image.
 
 image::devops-envs-cart-build.png[Create Cart Service]
 
-Click on *View Log* link to see the build logs as it runs. You can click on the *Follow* link to follow the logs in the browser.
+You can see the build logs as build is making progress. If you want to see the full logs, click on *View Log* link to see the build logs in a larger window. You can click on the *Follow* link to follow the logs in the browser.
 
 image::devops-envs-cart-build-logs.png[Build Logs]
 
@@ -84,12 +82,12 @@ When the build finishes and the application docker image is created, the docker 
 
 image::devops-envs-cart-deployed.png[Create Cart Service]
 
-Notice the warning about lack of health checks on the deployed container. OpenShift uses health checks to detect and handle or heal unhealthy containers which is not set yet on the deployed Cart service. OpenShift runs the following probes to manage the container and application health:
+OpenShift uses {{OPENSHIFT_DOCS_BASE}}/dev_guide/application_health.html[container health checks] to detect and handle or heal unhealthy containers which is not set yet on the deployed Cart service. OpenShift runs the following probes to manage the container and application health:
 
 * _Liveness Probe_: a liveness probe checks if the container is still running. If the liveness probe fails, OpenShift restarts the container
 * _Readiness Probe_: a readiness probe determines if a container is ready to service requests. If the readiness probe fails, OpenShift removes that container from the list of endpoints in the service load-balancer. A readiness probe can be used to signal the service load-balancer that even though a container is running, it should not receive any traffic.
 
-There are multiple ways to check a container liveness and readiness. You can define an HTTP URL, a command to execute in the container or a TCP socket to connect to. Click on *Add health checks* and configure HTTP liveness and readiness probes for the Cart service.
+There are multiple ways to check a container liveness and readiness. You can define an HTTP URL, a command to execute in the container or a TCP socket to connect to. Click on *cart* deployment to see the deployment configuration for the Cart service. Alternatively, you can click on *Applications* &rarr; *Deployments* from the left-side menu and then on *cart*. Click on *Action* menu button and then *Edit Health Checks* to configure HTTP liveness and readiness probes for the Cart service.
 
 * Type: `HTTP`
 * Path: `/health`
@@ -130,21 +128,25 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 [source,shell]
 ----
-$ oc new-app redhat-openjdk18-openshift:1.0~{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git \
+$ oc new-app redhat-openjdk18-openshift:1.2~{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git \
     --name=cart \
     --build-env=MAVEN_MIRROR_URL={{NEXUS_URL}}
 
---> Found image bc310f6 (5 weeks old) in image stream "openshift/redhat-openjdk18-openshift" under tag "latest" for "redhat-openjdk18-openshift"
+--> Found image 56cfa0a (6 weeks old) in image stream "openshift/redhat-openjdk18-openshift" under tag "1.2" for "redhat-openjdk18-openshift:1.2"
+
     Java Applications
     -----------------
     Platform for building and running plain Java applications (fat-jar and flat classpath)
+
     Tags: builder, java
+
     * A source build using source code from {{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git will be created
       * The resulting image will be pushed to image stream "cart:latest"
       * Use 'start-build' to trigger a new build
     * This image will be deployed in deployment config "cart"
     * Ports 8080/tcp, 8443/tcp, 8778/tcp will be load balanced by service "cart"
       * Other containers can access this service through the hostname "cart"
+
 --> Creating resources ...
     imagestream "cart" created
     buildconfig "cart" created
@@ -152,6 +154,8 @@ $ oc new-app redhat-openjdk18-openshift:1.0~{{GIT_SERVER_URL}}/{{GIT_USER}}/cart
     service "cart" created
 --> Success
     Build scheduled, use 'oc logs -f bc/cart' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose svc/cart'
     Run 'oc status' to view your app.
 ----
 

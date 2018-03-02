@@ -12,11 +12,11 @@ Go to project list in OpenShift and click on *New Project* for the Prod deployme
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
-image::devops-promotion-prod-project.png[Production Project]
+image::devops-promotion-prod-project.png[Production Project, width=340]
 
 Now you should see the _Dev_ and _Prod_ projects in the OpenShift Web Console, as well as via CLI:
 
-image::devops-promotion-projects.png[Projects]
+image::devops-promotion-projects.png[Projects, width=340]
 
 [source,shell]
 ----
@@ -25,15 +25,54 @@ $ oc get projects
 
 #### CoolStore Webshop in Production Environment
 
-You can use an OpenShift template to deploy the CoolStore application services in the _Prod_ environment. An OpenShift template describes how to build, configure and deploy a set of contains in a reproducible manner. The container images for _Web UI_, _Coolstore GW_, _Catalog_ and _Inventory_ services are already built by respective teams and are available in the OpenShift integrated container registry. The CoolStore template pulls these images and deploys and configures them images in the _Prod_ environment.
+You can use an OpenShift template to deploy the CoolStore application services in the _Prod_ environment. An {{OPENSHIFT_DOCS_BASE}}/dev_guide/templates.html[OpenShift template] describes how to build, configure and deploy a set of contains in a reproducible manner. Note that normally, the container images for _Web UI_, _Coolstore GW_, _Catalog_ and _Inventory_ services are already built by respective teams and are available in the OpenShift integrated container registry. The CoolStore template would then just pull these images and deploys and configures them in the _Prod_ environment.
 
 image::devops-intro-coolstore-arch.png[CoolStore Architecture]
 
-In the _Prod_ project, click on *Add to project* and then search for coolstore template. 
+In this lab, however, you are the whole team! Therefore you should build the images for once so that you can use them for the rest of the lab and deploy them in the production environment.
 
-image::devops-promotion-coolstore-template.png[CoolStore Template]
+Install the following templates so that you can use one for building the images, and the other for deploying the production images which in real scenarios will be already available in the registry.
 
-Click on the *coolstore* template. 
+[source,shell]
+----
+$ oc project prod-{{PROJECT_SUFFIX}}
+$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/master/openshift/coolstore-build-template.yaml 
+$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/master/openshift/coolstore-deployment-template.yaml 
+----
+
+Now click on *Add to project* and *Select from Project* in order to use the build template for creating the production images
+
+image::devops-promotion-select-from-project.png[Select from Project]
+
+The two templates you just created are available in the catalog.
+
+image::devops-promotion-select-from-project-templates.png[Project Catalog]
+
+Click on *CoolStore Builds* and then *Next* and again *Next*. Specify the following in the fields and then click on *Create*.
+
+* Maven mirror url: {{NEXUS_URL}}
+* Build Tag: `prod`
+
+This will tell the template to store the built images with the `prod` tag, since we want to use them in the production.
+
+image::devops-promotion-build-template.png[CoolStore Build Template]
+
+This templates creates a buildconfig for each image you need and starts building the components. As soon as builds are complete, the images will be pushed into the OpenShift integrated registry with the `prod` tag as specified via a parameter in the above 
+command. 
+
+Click on *Builds* &rarr; *Builds* to see the list of build configs as they build is in progress.
+
+image::devops-promotion-builds.png[Image Builds]
+
+After the builds are complete, you won't need the build configs any more. Like mentioned before, these images would really come from other teams but since you are a one-man team, you just built them yourself. If you want, you could clean up the production environment and remove the build configs.
+
+[source,shell]
+----
+$ oc project prod-{{PROJECT_SUFFIX}}
+$ oc delete bc --all
+----
+
+Now that you have the images, you can go ahead and deploy the CoolStore application in production using the newly built images. In the _Prod_ project, click on *Add to project* and *Select from Project* again. Choose the *CoolStore Deployments* template this time and then *Next* and again *Next*.
 
 If you remember, the Cart route hostname was generated for you in the *Cart Dev* project with the format: `cart-dev-{{PROJECT_SUFFIX}}.<HOSTNAME>`. Specify the *Hostname Suffix* in the form by replacing `cart-dev-{{PROJECT_SUFFIX}}` in that generated format with `prod-{{PROJECT_SUFFIX}}`, so that the value of *Hostname Suffix* would be `prod-{{PROJECT_SUFFIX}}.<HOSTNAME>`
 
@@ -41,11 +80,13 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 image::devops-promotion-coolstore-template-params.png[CoolStore Template - Parameters]
 
-Click on *Create*, and then on *Continue to overview*. You will notice that all services are deployed in _Prod_ environment except the Cart service. That is because the Cart service is currently deployed in the Dev environment and its container image is not promoted to the _Prod_ environment yet. You will do that in this lab.
+Click on *Create*, and then on *Continue to overview*. You will notice that all services, including Cart are deployed in _Prod_ environment.
 
 image::devops-promotion-coolstore-deployed.png[CoolStore Webshop Containers]
 
-In order to promote the Cart container image from _Dev_ environment to _Prod_ environment, you can use the `oc tag` CLI command:
+Although Cart is deployed, let's replace it with the the image Cart service that is running in the Dev environment through promoting the Cart container image from _Dev_ environment to _Prod_ environment. The reason for doing so is to guarantee that the container image that runs in Prod environment is the same image that is running and has been tested in the Dev environment.
+
+Uou can use the `oc tag` CLI command for promoting images between environments.
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
@@ -57,9 +98,6 @@ Tag cart:prod set to dev-{{PROJECT_SUFFIX}}/cart@sha256:ee898ec51ab7bbce53ff4142
 ----
 
 The above command promotes the `cart:latest` container image which is the latest image build of the Cart service in the _Dev_ environment, to the _Prod_ environment and names it `cart:prod`. As soon as the cart image is promoted to the _Prod_ environment, the Cart container gets automatically deployed. As new Cart service container images are built, the _Prod_ environment remains intact until you promote the new image builds to the _Prod_ environment after sufficient testing.
-
-image::devops-promotion-cart-deploy.png[Promoting Cart Container Image]
-
 
 When the Cart service is ready, click on the Web UI route url and verify that CoolStore online shop is working correctly. If the product list is not displayed correctly, refresh the page a few times.
 
@@ -77,16 +115,17 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 [source,shell]
 ----
-stage('Approve') {
-  timeout(time:15, unit:'MINUTES') {
-    input message:'Approve Deploy to Prod?'
+stage('Promote to Prod') {
+  steps {
+    timeout(time:15, unit:'MINUTES') {
+        input message: "Approve Promotion to Prod?", ok: "Promote"
+    }
+    script {
+      openshift.withCluster() {
+        openshift.tag("dev-{{PROJECT_SUFFIX}}/cart:latest", "prod-{{PROJECT_SUFFIX}}/cart:prod")
+      }
+    }
   }
-}
-stage('Promote') {
-  openshiftTag srcStream: 'cart', srcTag: 'latest', namespace: 'dev-{{PROJECT_SUFFIX}}', destStream: 'cart', destTag: "prod", destinationNamespace: 'prod-{{PROJECT_SUFFIX}}'
-  sleep 10
-  openshiftVerifyDeployment depCfg: "cart", replicaCount: 1, verifyReplicaCount: true, namespace: 'prod-{{PROJECT_SUFFIX}}'
-  sleep 5
 }
 ----
 
@@ -140,12 +179,16 @@ The pipeline builds and deploys the Cart service in the Dev project and then pau
 
 image::devops-promotion-pipeline-manual.png[Manual Approval in CI/CD Pipeline]
 
-Since use of ServiceNow or other IT Workflow systems is out of the scope of this lab, you will Jenkins to approve the production deployment. Click on *Input Required* which takes you to the Jenkins login page which is integrated with OpenShift OAuth authorization server. Login with your OpenShift credentials and then click on *Yes* to approve the production deployment.
+Since use of ServiceNow or other IT Workflow systems is out of the scope of this lab, you will Jenkins to approve the production deployment. Click on *Input Required* which takes you to the Jenkins login page which is integrated with OpenShift OAuth authorization server. Login with your OpenShift credentials.
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
 * Username: `{{OPENSHIFT_USER}}`
 * Password: `{{OPENSHIFT_PASSWORD}}`
+
+image::devops-promotion-pipeline-approve.png[Approve Promotion to Production]
+
+Click on *Promote* to approve promoting the Cart container image from Dev environment to production environment.
 
 Upon approval, the pipeline continues and promotes the Cart container image from the _Dev_ environment to the _Prod_ environment and deploys it in the _Prod_ environment.
 

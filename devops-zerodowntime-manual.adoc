@@ -100,20 +100,19 @@ The Cart Blue and Green containers will be deployed alongside the previous Cart 
 
 image::devops-zerodowntime-cart-bluegreen.png[Cart Blue Service and Cart Green Service]
 
-You created the Cart blue and green services but the route is still pointing to the old container instead of either blue or the green container:
-
-image::devops-zerodowntime-cart-route.png[Cart Route]
-
-Click on *Applications -> Routes* on the left sidebar menu and then click on *cart* route. Notice that it is currently pointing at the cart service. Click on *Actions -> Edit* from the top-right menu. You can create a blue/green route by clicking on *Split traffic across multiple services* and adding `cart-blue` and `cart-green` services with 100 and 0 weight respectively to send all traffic to the cart-blue service and then click on Save. You can {{OPENSHIFT_DOCS_BASE}}/dev_guide/routes.html#routes-load-balancing-for-AB-testing[split the traffic] coming to a route across multiple backend services via weighting however in this lab you only need the `cart-blue` and `cart-green` services.
+You created the Cart blue and green services but the route is still pointing to the old container instead of either blue or the green container.
+Click on *Applications -> Routes* on the left sidebar menu and then click on *cart* route. Notice that it is currently pointing at the cart service. Click on *Actions* &rarr; *Edit* from the top-right menu. You can create a blue/green route by clicking on *Split traffic across multiple services* and adding `cart-blue` and `cart-green` services with 100 and 0 weight respectively to send all traffic to the cart-blue service and then click on *Save*. You can {{OPENSHIFT_DOCS_BASE}}/dev_guide/routes.html#routes-load-balancing-for-AB-testing[split the traffic] coming to a route across multiple backend services via weighting however in this lab you only need the `cart-blue` and `cart-green` services.
 
 image::devops-zerodowntime-edit-route.png[Edit Route]
-
-image::devops-zerodowntime-blue-live.png[Route Traffic Split]
 
 Split routes in OpenShift enables other deployment patterns such as Canary Release and A/B testing as well by specifying other weight ratios on the services for example:
 
 * 10/90:  to send 10% of production traffic to the new container for Canary Release
 * 50/50: to send 50% of traffic to the new container for A/B Testing
+
+image::devops-zerodowntime-bg-routes.png[Route Traffic Split]
+
+image::devops-zerodowntime-blue-live.png[Route Traffic Split]
 
 The blue/green deployment setup is complete now. Clean up the Prod environment by removing the Cart service and deploymentconfig since you will be using the green and blue versions instead. 
 

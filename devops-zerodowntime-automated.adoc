@@ -16,55 +16,103 @@ Open the Jenkinsfile you added to the pipelines Git repository in a text editor 
 
 [source,shell]
 ----
-node('maven') {
-  stage('Build App') {
-    git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
-    sh "mvn clean package -s src/main/config/settings.xml"
+def tag,altTag
+
+pipeline {
+  agent {
+    label 'maven'
   }
-  stage('Integration Test') {
-    sh "mvn verify -s src/main/config/settings.xml"
-  }
-  stage('Build Image') {
-    sh "oc start-build cart --from-file=target/cart.jar --follow"
-  }
-  stage('Deploy') {
-    openshiftDeploy depCfg: 'cart'
-    openshiftVerifyDeployment depCfg: 'cart', replicaCount: 1, verifyReplicaCount: true
-  }
-  stage('Component Test') {
-    sh "curl -s -X POST http://cart.dev-{{PROJECT_SUFFIX}}.svc:8080/api/cart/dummy/666/1"
-    sh "curl -s http://cart.dev-{{PROJECT_SUFFIX}}.svc:8080/api/cart/dummy | grep 'Dummy Product'"
-  }
-  def tag="blue"
-  def altTag="green"
- 
-  stage('Promote') {
-    sh "oc project prod-{{PROJECT_SUFFIX}}"
-    sh "oc get route cart -n prod-{{PROJECT_SUFFIX}} -o jsonpath='{ .spec.to.name }' > activeservice"
-    activeService = readFile('activeservice').trim()
-    if (activeService == "cart-blue") {
-      tag = "green"
-      altTag = "blue"
+  stages {
+    stage('Build App') {
+      steps {
+        sh "mvn clean package -s src/main/config/settings.xml"
+      }
     }
-    openshiftTag sourceStream: 'cart', sourceTag: 'latest', namespace: 'dev-{{PROJECT_SUFFIX}}', destinationStream: 'cart', destinationTag: "prod-${tag}", destinationNamespace: 'prod-{{PROJECT_SUFFIX}}'
-    sleep 10
-    openshiftVerifyDeployment deploymentConfig: "cart-${tag}", replicaCount: '1', verifyReplicaCount: true, namespace: 'prod-{{PROJECT_SUFFIX}}'
-    sleep 5
-  }
-  stage('End-To-End Test') {
-    sh "curl -s -X POST http://cart-${tag}.prod-{{PROJECT_SUFFIX}}.svc:8080/api/cart/dummy/444434/1"
-    sh "curl -s http://cart-${tag}.prod-{{PROJECT_SUFFIX}}.svc:8080/api/cart/dummy | grep 'Pebble Smart Watch'"
-  }
-  stage('Approve Go Live') {
-    timeout(time:15, unit:'MINUTES') {
-      input message:'Go Live in Prod?'
+    stage('Integration Test') {
+      steps {
+        sh "mvn verify -s src/main/config/settings.xml"
+      }
+    }
+    stage('Build Image') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject() {
+              openshift.startBuild("cart", "--from-file=target/cart.jar", "--follow")
+            }
+          }
+        }
+      }
+    }
+    stage('Deploy') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject() {
+              dc = openshift.selector("dc", "cart")
+              dc.rollout().latest()
+              timeout(10) {
+                  dc.rollout().status("-w")
+              }
+            }
+          }
+        }
+      }
+    }
+    stage('Component Test') {
+      steps {
+        script {
+          sh "curl -s -X POST http://cart:8080/api/cart/dummy/666/1"
+          sh "curl -s http://cart:8080/api/cart/dummy | grep 'Dummy Product'"
+        }
+      }
+    }
+    stage('Promote') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject("prod-{{PROJECT_SUFFIX}}") {
+              def route = openshift.selector("route", "cart").object()
+              def backends = []
+              backends.add(route.spec.to)
+              backends.addAll(route.spec.alternateBackends)
+              def svc = backends.find {it.weight == 100}
+              tag = svc.name == "cart-green" ? "blue" : "green"
+              altTag = svc.name == "cart-green" ? "green" : "blue"
+
+              openshift.tag("dev-{{PROJECT_SUFFIX}}/cart:latest", "prod-{{PROJECT_SUFFIX}}/cart:prod-${tag}")
+              openshift.selector("dc", "cart-${tag}").rollout().status()
+            }
+          }
+        }
+      }
+    }
+
+    stage('End-To-End Test') {
+      steps {
+        script {
+          sh "curl -s -X POST http://cart-${tag}.prod-{{PROJECT_SUFFIX}}.svc:8080/api/cart/dummy/444434/1"
+          sh "curl -s http://cart-${tag}.prod-{{PROJECT_SUFFIX}}.svc:8080/api/cart/dummy | grep 'Pebble Smart Watch'"
+        }
+      }
+    }
+
+    stage('Approve Go Live') {
+      steps {
+        timeout(time:15, unit:'MINUTES') {
+            input message: "Approve Promotion to Prod?", ok: "Promote"
+        }
+        script {
+          openshift.withCluster() {
+            openshift.withProject("prod-{{PROJECT_SUFFIX}}") {
+              openshift.set("route-backends", "cart" , "cart-${tag}=100", "cart-${altTag}=0")
+            }
+          }
+        }
+      }
     }
   }
-  stage('Go Live') {
-    sh "oc project prod-{{PROJECT_SUFFIX}}"
-    sh "oc set route-backends cart cart-${tag}=100 cart-${altTag}=0 -n prod-{{PROJECT_SUFFIX}}"
-  }
-}
+}   
 ----
 
 The above pipeline makes the following changes compared to the previous lab:
@@ -106,7 +154,12 @@ In the *cart-service* repository, browse to the promotion service at `src/main/j
         }
 ----
 
-Click on *Commit Changes* button to commit the new shipping promotion rule to the Git repository. Go back to OpenShift Web Console and in the _Dev_ project, click on *Builds -> Pipelines* on the left sidebar menu and wait until pipeline pauses at the *Approve Go Live* stage. At this stage, a new version of the Cart service is deployed in the Prod environment as Cart Blue which does not receive any production traffic yet. Note that if you have executed  the Cart CI/CD pipeline multiple times, Cart Green might be the inactive deployment in your environment.
+Click on *Commit Changes* button to commit the new shipping promotion rule to the Git repository. Go back to OpenShift Web Console and in the _Dev_ project, click on *Builds -> Pipelines* on the left sidebar menu and wait until pipeline pauses at the *Approve Go Live* stage. 
+
+
+image::devops-zerodowntime-bg-approve.png[Approve Go Live in Deployment Pipeline]
+
+At this stage, a new version of the Cart service is deployed in the Prod environment as Cart Blue which does not receive any production traffic yet. Note that if you have executed  the Cart CI/CD pipeline multiple times, Cart Green might be the inactive deployment in your environment.
 
 After deployment is ready, verify that the new minimum order for free shipping is working correctly in the inactive container by adding 1 smartwatch to the test shopping cart :
 
@@ -120,4 +173,6 @@ $ curl -X POST http://{{CART_BLUE_ROUTE}}/api/cart/FOO/444434/1
 
 Notice that the shipping cost is zero since the total order is above the 20$ minimum order. Click on the Web UI route URL and add a Pebble Smart Watch to your shopping cart. As expected, the shipping cost is not zero.
 
-Now that the new minimum order rule is verified in the new version of Cart service in the Prod environment, you can approve the *Go Live*. Go back to *Builds -> Pipelines* and click on *Input Required* and then *Yes* to approve the Go Live. Add a Pebble Smart Watch to your shopping cart again and verify that shipping is now free in the live version.
+Now that the new minimum order rule is verified in the new version of Cart service in the Prod environment, you can approve the *Go Live*. Go back to *Builds -> Pipelines* and click on *Input Required* and then *Promote* to approve the Go Live. Add a Pebble Smart Watch to your shopping cart again and verify that shipping is now free in the live version.
+
+image::devops-zerodowntime-bg-approved.png[Deployment Pipeline Complete]

@@ -15,7 +15,7 @@ Go to OpenShift Web Console, click on the logo to see the list of projects. Crea
 * Name: `ci-{{PROJECT_SUFFIX}}`
 * Display Name: `CI/CD Infra`
 
-Click on the *Add to project* button. Then, scroll down to the *Technologies* section and click on *Continuous Integration & Deployment*:
+Click on the *Browse Catalog* button and then on the *CI/CD* category.
 
 image::devops-jenkins-catalog.png[OpenShift Catalog]
 
@@ -24,15 +24,11 @@ The two available templates deploy the Jenkins server but differ in their storag
 * _Jenkins Ephemeral_ uses ephemeral storage. On pod restart, all data is lost. This template is useful for development or testing only.
 * _Jenkins Persistent_ uses a persistent volume store. Data survives a pod restart. To use a persistent volume store, the cluster administrator must define a persistent volume pool.
 
-For this lab, click on *Jenkins Ephemeral* template:
-
-image::devops-jenkins-templates.png[Jenkins Templates]
+For this lab, click on *Jenkins Ephemeral* template. If you don't have this template in your service catalog, then use the *Jenkins Persistent* template.
 
 You can customize the Jenkins properties such as service name, admin password, memory allocation, etc through the parameters in the web console. We can leave all of the default values, so just click on *Create* to deploy Jenkins.
 
-OpenShift deploys a Jenkins pod and also creates a service and route for the deployed container:
-
-image::devops-jenkins-containers.png[Jenkins Containers]
+OpenShift deploys a Jenkins pod and also creates a service and route for the deployed container.
 
 Click on the Jenkins route in order to open the Jenkins Console. You will again need to accept the certificate. The Jenkins image that is provided by Red Hat uses an OAuth integration with OpenShift.
 

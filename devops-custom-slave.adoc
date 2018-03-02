@@ -47,7 +47,7 @@ You can build the docker image on OpenShift by creating a new build from the Git
 [source,shell]
 ----
 $ oc project ci
-$ oc new-build https://github.com/openshift-evangelists/summit17-cicd-lab.git --name=jenkins-slave-gradle-rhel7 --context-dir=lab-10
+$ oc new-build https://github.com/openshift-labs/devops-labs.git#ocp-3.7 --name=jenkins-slave-gradle-rhel7 --context-dir=solutions/lab-10
 $ oc logs -f bc/jenkins-slave-gradle-rhel7 
 ----
 
@@ -87,13 +87,22 @@ You can instruct Jenkins to run a pipeline using a specific slave image by speci
 
 [source,shell]
 ----
-node('gradle') {
-  stage('Build') {
-    git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
-    sh "gradle build"
+pipeline {
+  agent {
+    label 'gradle'
   }
-  stage('Test') {
-    sh "gradle test"
+  stages {
+    stage('Build') {
+      steps {
+        git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
+        sh "gradle build
+      }
+    }
+    stage('Test') {
+      steps {
+        sh "gradle test
+      }
+    }
   }
 }
 ----
@@ -110,13 +119,22 @@ spec:
   strategy:
     jenkinsPipelineStrategy:
       jenkinsfile: |-
-        node('gradle') {
-          stage('Build') {
-            git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
-            sh "gradle build"
+        pipeline {
+          agent {
+            label 'gradle'
           }
-          stage('Test') {
-            sh "gradle test"
+          stages {
+            stage('Build') {
+              steps {
+                git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
+                sh "gradle build
+              }
+            }
+            stage('Test') {
+              steps {
+                sh "gradle test
+              }
+            }
           }
         }
     type: JenkinsPipeline

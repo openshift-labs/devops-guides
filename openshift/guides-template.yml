@@ -14,7 +14,7 @@ parameters:
 - displayName: Content Git Ref
   name: GIT_REF
   required: true
-  value: master
+  value: ocp-3.7
 - displayName: OpenShift Master
   name: OPENSHIFT_MASTER
   required: true

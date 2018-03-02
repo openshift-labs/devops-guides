@@ -36,8 +36,8 @@ Install the following templates so that you can use one for building the images,
 [source,shell]
 ----
 $ oc project prod-{{PROJECT_SUFFIX}}
-$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/master/openshift/coolstore-build-template.yaml 
-$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/master/openshift/coolstore-deployment-template.yaml 
+$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/ocp-3.7/openshift/coolstore-build-template.yaml 
+$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/ocp-3.7/openshift/coolstore-deployment-template.yaml 
 ----
 
 Now click on *Add to project* and *Select from Project* in order to use the build template for creating the production images

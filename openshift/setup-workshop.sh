@@ -21,7 +21,7 @@ function usage() {
     echo "   --gogs-user-count [num]            Number of users to be created on Gogs. Default 50"
     echo "   --openshift-password [password]    Password for existing OpenShift users. Default 'openshift3'"
     echo "   --apps-hostname-prefix [prefix]    Application hostname prefix in http://svc-namespace.prefix.hostname. Default 'apps'"
-    echo "   --infra-project [project]          Project for workshop infra components e.g. Nexus and Gogs . Default 'ocp-workshop'"
+    echo "   --infra-project [project]          Project for workshop infra components e.g. Nexus and Gogs . Default 'lab-infra'"
     echo
 }
 
@@ -117,7 +117,7 @@ GOGS_ADMIN_USER=${ARG_GOGS_ADMIN_USER:-gogs}
 GOGS_ADMIN_PASSWORD=${ARG_GOGS_ADMIN_PWD:-openshift3}
 USER_PASSWORD=${ARG_OPENSHIFT_PWD:-openshift3}
 APPS_HOST_PREFIX=${ARG_APPS_HOSTNAME_PREFIX:-apps}
-INFRA_PROJECT=${ARG_INFRA_PROJECT:-ocp-workshop}
+INFRA_PROJECT=${ARG_INFRA_PROJECT:-lab-infra}
 GOGS_USER_COUNT=${ARG_GOGS_USER_COUNT:-50}
 
 OPENSHIFT_MASTER=$(oc whoami --show-server)
@@ -283,75 +283,6 @@ EOM
   rm -rf $_REPO_DIR
 }
 
-function build_coolstore_images() {
-  oc new-project coolstore-images
-
-  # wait for nexus
-  wait_while_empty "Nexus" 600 "oc get ep nexus -o yaml -n $INFRA_PROJECT | grep '\- addresses:'"
-
-  # catalog service
-  oc new-app redhat-openjdk18-openshift:1.1~https://github.com/openshift-roadshow/devops-workshop-labs.git \
-        --context-dir=catalog-spring-boot \
-        --name=catalog \
-        --labels=app=coolstore \
-        -n coolstore-images
-  #         --build-env=MAVEN_MIRROR_URL=$NEXUS_URL \        
-  oc cancel-build bc/catalog -n coolstore-images
-
-
-  # gateway service
-  oc new-app redhat-openjdk18-openshift:1.1~https://github.com/openshift-roadshow/devops-workshop-labs.git \
-        --context-dir=gateway-vertx \
-        --name=coolstore-gw \
-        --labels=app=coolstore \
-        -n coolstore-images
-  oc cancel-build bc/coolstore-gw -n coolstore-images
-
-  # inventory service
-  oc new-app redhat-openjdk18-openshift:1.1~https://github.com/openshift-roadshow/devops-workshop-labs.git \
-        --context-dir=inventory-wildfly-swarm \
-        --name=inventory \
-        --labels=app=coolstore \
-        -n coolstore-images
-  oc cancel-build bc/inventory -n coolstore-images
-
-  # cart service
-  oc new-app redhat-openjdk18-openshift:1.1~https://github.com/openshift-roadshow/devops-workshop-labs.git \
-        --context-dir=cart-spring-boot \
-        --name=cart \
-        --labels=app=coolstore \
-        -n coolstore-images
-  oc cancel-build bc/cart -n coolstore-images
-
-  # web ui
-  oc new-app nodejs:4~https://github.com/openshift-roadshow/devops-workshop-labs.git \
-        --context-dir=web-nodejs \
-        --name=web-ui \
-        --labels=app=coolstore \
-        -n coolstore-images
-  oc cancel-build bc/web-ui -n coolstore-images
-
-  # we just need the buildconfigs
-  oc delete dc,svc -l app=coolstore -n coolstore-images
-
-  # build images
-  oc start-build web-ui -n coolstore-images --follow
-  oc start-build inventory -n coolstore-images --follow
-  oc start-build catalog -n coolstore-images --follow
-  oc start-build coolstore-gw -n coolstore-images --follow
-  oc start-build cart -n coolstore-images --follow
-
-  # tag in openshift namespace
-  oc tag coolstore-images/web-ui:latest       openshift/coolstore-web-ui:prod
-  oc tag coolstore-images/inventory:latest    openshift/coolstore-inventory:prod
-  oc tag coolstore-images/catalog:latest      openshift/coolstore-catalog:prod
-  oc tag coolstore-images/coolstore-gw:latest openshift/coolstore-gateway:prod
-  oc tag coolstore-images/cart:latest         openshift/coolstore-cart:prod
-
-  # add coolstore template
-  oc create -f https://raw.githubusercontent.com/openshift-roadshow/devops-workshop-labs/master/openshift/coolstore-deployment-template.yaml -n openshift
-}
-
 function clean_up() {
   local _PROJECTS="$INFRA_PROJECT lab-infra coolstore-images"
   # delete projects
@@ -493,7 +424,6 @@ case "$ARG_COMMAND" in
         deploy_nexus; sleep 1
         deploy_guides; sleep 1
         generate_gogs_users; sleep 1
-        build_coolstore_images;
         popd >/dev/null
         
         echo

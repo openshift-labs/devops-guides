@@ -20,7 +20,7 @@ function usage() {
     echo "   --gogs-admin-password [password]   Gogs admin password to be created. Default 'openshift3'"
     echo "   --gogs-user-count [num]            Number of users to be created on Gogs. Default 50"
     echo "   --openshift-password [password]    Password for existing OpenShift users. Default 'openshift3'"
-    echo "   --apps-hostname-prefix [prefix]    Application hostname prefix in http://svc-namespace.prefix.hostname. Default 'apps'"
+    echo "   --apps-hostname [prefix]           Application hostname prefix in http://svc-[HOSTNAME]. Default 'apps.127.0.0.1.nio'"
     echo "   --infra-project [project]          Project for workshop infra components e.g. Nexus and Gogs . Default 'lab-infra'"
     echo
 }
@@ -116,14 +116,14 @@ done
 GOGS_ADMIN_USER=${ARG_GOGS_ADMIN_USER:-gogs}
 GOGS_ADMIN_PASSWORD=${ARG_GOGS_ADMIN_PWD:-openshift3}
 USER_PASSWORD=${ARG_OPENSHIFT_PWD:-openshift3}
-APPS_HOST_PREFIX=${ARG_APPS_HOSTNAME_PREFIX:-apps}
+APPS_HOST_PREFIX=${ARG_APPS_HOSTNAME_PREFIX:-apps.127.0.0.1.nio}
 INFRA_PROJECT=${ARG_INFRA_PROJECT:-lab-infra}
 GOGS_USER_COUNT=${ARG_GOGS_USER_COUNT:-50}
+LABS_GITHUB_REF=ocp-3.7
 
 OPENSHIFT_MASTER=$(oc whoami --show-server)
-OPENSHIFT_APPS_HOSTNAME=$APPS_HOST_PREFIX.$(oc whoami --show-server | sed "s|https://master\.\(.*\)|\1|g") 
-GOGS_HOSTNAME=gogs-$INFRA_PROJECT.$OPENSHIFT_APPS_HOSTNAME
-NEXUS_URL=http://nexus-$INFRA_PROJECT.$OPENSHIFT_APPS_HOSTNAME/content/groups/public/
+GOGS_HOSTNAME=gogs-$INFRA_PROJECT.$APPS_HOST_PREFIX
+NEXUS_URL=http://nexus-$INFRA_PROJECT.$APPS_HOST_PREFIX/content/groups/public/
 
 
 ################################
@@ -196,11 +196,11 @@ function deploy_nexus() {
 
 function deploy_guides() {
   oc new-app --name=guides \
-    --docker-image=osevg/workshopper:ruby \
-    --env=WORKSHOPS_URLS=https://raw.githubusercontent.com/openshift-roadshow/devops-workshop-guides/master/_devops-workshop.yml \
-    --env=CONTENT_URL_PREFIX=https://raw.githubusercontent.com/openshift-roadshow/devops-workshop-guides/master \
+    --docker-image=osevg/workshopper \
+    --env=WORKSHOPS_URLS=https://raw.githubusercontent.com/openshift-labs/devops-guides/$LABS_GITHUB_REF/_devops-workshop.yml \
+    --env=CONTENT_URL_PREFIX=https://raw.githubusercontent.com/openshift-labs/devops-guides/$LABS_GITHUB_REF \
     --env=OPENSHIFT_URL=$OPENSHIFT_MASTER \
-    --env=OPENSHIFT_APPS_HOSTNAME=$OPENSHIFT_APPS_HOSTNAME \
+    --env=OPENSHIFT_APPS_HOSTNAME=$APPS_HOST_PREFIX \
     --env=OPENSHIFT_USER=userX \
     --env=OPENSHIFT_PASSWORD=$USER_PASSWORD \
     --env=GIT_SERVER_URL=http://$GOGS_HOSTNAME \
@@ -232,13 +232,13 @@ function generate_gogs_users() {
 
   # init cart-service repo
   local _REPO_DIR=/tmp/$(date +%s)-coolstore-microservice
-  local _GITHUB_REPO_NAME=devops-workshop-labs
+
   rm -rf $_REPO_DIR
   mkdir $_REPO_DIR
   cd $_REPO_DIR
-  curl -sL -o ./coolstore.zip https://github.com/openshift-roadshow/$_GITHUB_REPO_NAME/archive/master.zip
+  curl -sL -o ./coolstore.zip https://github.com/openshift-labs/devops-labs/archive/$LABS_GITHUB_REF.zip
   unzip coolstore.zip
-  cd $_GITHUB_REPO_NAME-master/cart-spring-boot
+  cd devops-labs-$LABS_GITHUB_REF/cart-spring-boot
   git init
   git add . --all
   git config user.email "developer@rhdevops.com"

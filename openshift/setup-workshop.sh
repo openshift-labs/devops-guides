@@ -20,7 +20,7 @@ function usage() {
     echo "   --gogs-admin-password [password]   Gogs admin password to be created. Default 'openshift3'"
     echo "   --gogs-user-count [num]            Number of users to be created on Gogs. Default 50"
     echo "   --openshift-password [password]    Password for existing OpenShift users. Default 'openshift3'"
-    echo "   --apps-hostname [prefix]           Application hostname prefix in http://svc-[HOSTNAME]. Default 'apps.127.0.0.1.nio'"
+    echo "   --apps-hostname-prefix [prefix]    Application hostname prefix in http://svc-[HOSTNAME]. Default 'apps.127.0.0.1.nio'"
     echo "   --infra-project [project]          Project for workshop infra components e.g. Nexus and Gogs . Default 'lab-infra'"
     echo
 }

@@ -8,7 +8,7 @@ tags:
 metadata:
   dependencies: []
   displayName: "DevOps Workshop Installer"
-  longDescription: "Installs the required components (Git server, etc) for running the DevOps Workshop https://github.com/openshift-labs/devops-guides"
+  longDescription: "Installs the lab instructions and required components (Git server, etc) for running the DevOps Workshop https://github.com/openshift-labs/devops-guides"
   console.openshift.io/iconClass: "pficon pficon-process-automation"
   providerDisplayName: "Red Hat, Inc."
 plans:

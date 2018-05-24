@@ -6,7 +6,8 @@ vars:
   OPENSHIFT_USER: "userXX"
   OPENSHIFT_PASSWORD: "openshift3"
   OPENSHIFT_DOCS_BASE: "https://docs.openshift.com/container-platform/3.9"
-  NEXUS_URL: "http://nexus.lab-infra.svc:8081/content/groups/public/"
+  NEXUS_URL: "http://nexus.lab-infra.svc:8081/repository/maven-all-public"
+  NEXUS_EXTERNAL_URL: "http://nexus.lab-infra.192.168.99.100.nip.io/repository/maven-all-public"
   GIT_SERVER_URL: "http://gogs-lab-infra.192.168.99.100.nip.io"
   GIT_SERVER_INTERNAL_URL: "http://gogs.lab-infra.svc:3000"
   GIT_SERVER_TYPE: "gogs"
@@ -16,6 +17,7 @@ vars:
   CART_ROUTE: "CART-ROUTE"
   CART_BLUE_ROUTE: "CART-BLUE-ROUTE"
   CART_GREEN_ROUTE: "CART-GREEN-ROUTE"
+  ECLIPSE_CHE_URL: "http://che-lab-infra.192.168.99.100.nip.io"
 
 modules:
   activate:
@@ -30,3 +32,4 @@ modules:
   - devops-zerodowntime-automated
   - devops-deploy-jenkins
   - devops-custom-slave
+  - devops-env-info

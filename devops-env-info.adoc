@@ -1,0 +1,34 @@
+## Appendix: Environment Info
+
+You find all urls, hostnames, usernames and passwords that are needed during the 
+labs in this page. Note that the urls are also embedded inside each lab instructions.
+
+**OPENSHIFT**
+
+Address: {{ OPENSHIFT_URL }} +
+
+Username: `{{ OPENSHIFT_USER }}` + 
+Password: `{{ OPENSHIFT_PASSWORD }}` +
+
+IMPORTANT: Replace `{{ PROJECT_SUFFIX }}` with the id given to you by the instructor
+
+**GIT SERVER**
+
+Web: {{ GIT_SERVER_URL }}
+
+Username: `{{ GIT_USER }}` + 
+Password: `{{ GIT_PASSWORD }}` + 
+
+**NEXUS MAVEN REPOSITORY**
+
+Web: {{ NEXUS_EXTERNAL_URL }}
+
+**ECLIPSE CHE IDE**
+
+Register an account on Eclipse Che using an email address.
+
+Web: {{ ECLIPSE_CHE_URL }}
+
+**OPENSHIFT DOCS**
+
+Web: {{ OPENSHIFT_DOCS_BASE }}

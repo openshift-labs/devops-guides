@@ -4,7 +4,26 @@ In this lab you will get familiar with OpenShift Web Console and OpenShift CLI a
 
 #### OpenShift CLI
 
-The first thing we want to do to ensure that the `oc` command line tools was installed and successfully added to your path. In order to login, you can use the `oc` command and then specify the server that you want to authenticate to. Issue the following command:
+You can use the terminal on your workstation for running the OpenShift CLI commands, provided you {{OPENSHIFT_DOCS_BASE}}/cli_reference/get_started_cli.html[download the OpenShift CLI] and add it to your path.
+
+You might be familiar with the Eclipse IDE which is one of the most popular IDEs for Java and other
+programming languages. [Eclipse Che](https://www.eclipse.org/che/){:target="_blank"} is the next-generation Eclipse IDE which is web-based
+and gives you a full-featured IDE running in the cloud. You have an Eclipse Che instance deployed on the OpenShift cluster
+which you can use during these labs for creating files and running OpenShift CLI commands:
+{{ECLIPSE_CHE_URL}}
+
+Register on Eclipse Che with any email and the same username as your OpenShift username, and the log in.
+
+In the Eclipse Che dashboard, select the **Java with OpenShift CLI** stack and then click on **Create** button, and **Open** button to create and open a workspace for yourself.
+
+image::devops-explore-che-stack.png[Eclipse Che - Create Workspace]
+
+It might take a little while till your IDE workspace is setup in the browser. You can now use the **Terminal** window 
+in Eclipse Che to run any OpenShift CLI command.
+
+image::devops-explore-che-terminal.png[Eclipse Che - Terminal]
+
+In order to login, you can use the `oc` command and then specify the server that you want to authenticate to. Issue the following command:
 
 [source,shell]
 ----

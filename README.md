@@ -68,10 +68,12 @@ oc expose svc/guides
 
 ## Local Lab Instructions
 
+Clone the git repository and run the following inside the working copy directory:
+
 ```
 docker run -p 8080:8080 \
-              -v /path/to/clone/dir:/app-data \
+              -v $(pwd):/app-data \
               -e CONTENT_URL_PREFIX="file:///app-data" \
-              -e WORKSHOPS_URLS="file:///app-data/_devops-workshop" \
+              -e WORKSHOPS_URLS="file:///app-data/_devops-workshop.yml" \
               osevg/workshopper:latest
 ```

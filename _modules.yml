@@ -33,3 +33,5 @@ modules:
     name: Deploying Jenkins Manually
   devops-custom-slave:
     name: Creating Custom Jenkins Slave Pods
+  devops-env-info:
+    name: "Appnedix: Lab Environment"

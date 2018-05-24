@@ -18,13 +18,13 @@ plans:
     metadata:
       displayName: Default
     parameters:
-    - name: openshift_user
+    - name: openshift_admin_user
       title: Username
       description: Admin user is required for creating cluster resources
       type: string
       required: true
       display_group: OpenShift Admin
-    - name: openshift_password
+    - name: openshift_admin_password
       title: Password
       description: Admin password is required for creating cluster resources
       type: string
@@ -54,7 +54,7 @@ plans:
       default: "gogs"
       required: true
       display_group: Git Server
-    - name: gogs_admin_pwd
+    - name: gogs_adm_pwd
       title: Admin Password
       description: Password for Gogs admin user
       type: string

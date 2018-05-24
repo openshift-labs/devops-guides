@@ -1,0 +1,23 @@
+dist: trusty
+sudo: required
+language: python
+python: "2.7"
+
+services:
+  - docker
+
+before_install:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+
+install:
+  - pip install ansible
+  - ansible-galaxy install -r apb/requirements-travis.yml
+  - ansible-playbook apb/playbooks/provision.yml --syntax-check
+
+script:
+  - cd apb && docker build -t openshiftapb/devops-workshop-apb:$TRAVIS_COMMIT .
+
+after_success:
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker tag openshiftapb/devops-workshop-apb:$TRAVIS_COMMIT openshiftapb/devops-workshop-apb:$TAG
+  - docker push openshiftapb/devops-workshop-apb:$TAG

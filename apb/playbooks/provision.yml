@@ -12,7 +12,7 @@
     github_account: openshift-labs
     github_ref: ocp-3.9
     gogs_adm_user: gogs
-    gogs_admin_pwd: gogs
+    gogs_adm_pwd: gogs
     gogs_gen_user_count: 100
     gogs_gen_user_format: user%d
     gogs_gen_user_format_display: userX
@@ -75,7 +75,7 @@
       gogs_route: "gogs-{{ namespace }}.{{ apps_hostname_suffix }}"
       gogs_image_version: 0.11.34
       gogs_admin_user: "{{ gogs_adm_user }}"
-      gogs_admin_password: "{{ gogs_admin_pwd }}"
+      gogs_admin_password: "{{ gogs_adm_pwd }}"
       gogs_password: "{{ gogs_gen_user_pwd }}"
       gogs_generate_user_count: "{{ gogs_gen_user_count }}"
       gogs_generate_user_format: "{{ gogs_gen_user_format }}"
@@ -97,6 +97,16 @@
         GIT_PASSWORD: "{{ gogs_gen_user_pwd }}"
         OPENSHIFT_APPS_HOSTNAME: "{{ apps_hostname_suffix }}"
 
+  - import_role:
+      name: openshift_eclipse_che
+    vars:
+      project_name: "{{ namespace }}"
+      che_version: "6.5.0"
+      multi_user: true
+      route_suffix: "{{ apps_hostname_suffix }}"
+      keycloak_openshift_user: admin
+      keycloak_admin_pwd: admin
+
   - name: create temporary git directory
     tempfile:
       state: directory
@@ -116,9 +126,8 @@
       git config user.email "developer@rhdevops.com"
       git config user.name "developer"
       git commit -m "Initial add"
-      git push origin master
     args:
-      chdir: "{{ git_dir.path }}/devops-oab-labs-{{ labs_github_ref }}/cart-spring-boot"
+      chdir: "{{ git_dir.path }}/devops-labs-{{ github_ref }}/cart-spring-boot"
 
   - name: create cart-service git repositories
     uri:
@@ -137,12 +146,6 @@
   - name: push cart-service to git repository
     shell: "git push -f http://{{ item }}:{{ gogs_gen_user_pwd }}@gogs-{{ namespace }}.{{ apps_hostname_suffix }}/{{ item }}/cart-service.git master"
     args:
-      chdir: "{{ git_dir.path }}/devops-oab-labs-{{ labs_github_ref }}/cart-spring-boot"
+      chdir: "{{ git_dir.path }}/devops-labs-{{ github_ref }}/cart-spring-boot"
     with_sequence: start=1 end={{ gogs_gen_user_count|int }} format="{{ gogs_gen_user_format }}"
     when: gogs_gen_user_count|int > 1
-
-
-
-
-
-

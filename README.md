@@ -28,11 +28,11 @@ $ oc new-app -f openshift/guides-template.yml --param=OPENSHIFT_MASTER=$(oc whoa
 
 # Prepare Workshop
 
-The provided script `setup-workshop.sh` prepares an OpenShift 3.7 cluster for running the DevOps workshop 
+The provided script `setup-workshop.sh` prepares an OpenShift 3.9 cluster for running the DevOps workshop 
 by deploy the lab guides, Gogs server, Nexus, creating Git repositories, etc. 
 
 ```
 $ oc login -u system:admin
-$ bash <(curl -sL https://raw.githubusercontent.com/openshift-labs/devops-guides/ocp-3.7/openshift/setup-workshop.sh)
+$ bash <(curl -sL https://raw.githubusercontent.com/openshift-labs/devops-guides/ocp-3.9/openshift/setup-workshop.sh)
 ```
 

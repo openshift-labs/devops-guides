@@ -1,0 +1,148 @@
+- name: devops-workshop-apb playbook to provision the application
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    openshift_admin_user: 
+    openshift_admin_password: 
+    openshift_token:
+    openshift_user_format: userX
+    openshift_user_password:
+    project_suffix: "X"
+    github_account: openshift-labs
+    github_ref: ocp-3.9
+    gogs_adm_user: gogs
+    gogs_admin_pwd: gogs
+    gogs_gen_user_count: 100
+    gogs_gen_user_format: user%d
+    gogs_gen_user_format_display: userX
+    gogs_gen_user_pwd: gogs
+  roles:
+  - role: ansible.kubernetes-modules
+    install_python_requirements: no
+  - role: ansibleplaybookbundle.asb-modules
+
+  tasks:    
+  - name: login as super user with token
+    shell: "oc login --token={{ openshift_token }} --insecure-skip-tls-verify=true"
+    when:
+      - openshift_token is defined
+      - openshift_token is not none
+      - openshift_token|trim() != ""
+
+  - name: login as super user with pwd
+    shell: "oc login -u {{ openshift_admin_user }} -p {{ openshift_admin_password }} --insecure-skip-tls-verify=true"
+    when: >
+      openshift_token is not defined or
+      openshift_token is none or
+      openshift_token|trim() == ""
+
+  - name: extract openshift master url
+    shell: "oc whoami --show-server"
+    register: openshift_master_result
+
+  - set_fact:
+      openshift_master_url: "{{ openshift_master_result.stdout }}"
+          
+  - name: extract app route suffix
+    block:
+      - openshift_v1_route:
+          name: dummy
+          namespace: "{{ namespace }}"
+          state: present
+          spec_to_kind: Service
+          spec_to_name: dummy
+          spec_port_target_port: 8080
+        register: dummy_route
+      - set_fact:
+          apps_hostname_suffix: "{{ dummy_route.route.spec.host|regex_replace('^dummy-' + namespace + '\\.(.*)$', '\\1') }}"
+      - openshift_v1_route:
+          name: dummy
+          namespace: "{{ namespace }}"
+          state: absent
+
+  - import_role:
+      name: openshift_sonatype_nexus
+    vars:
+      project_name: "{{ namespace }}"
+      nexus_image_version: 3.11.0
+      nexus_max_memory: 6Gi
+
+  - import_role:
+      name: openshift_gogs
+    vars:
+      project_name: "{{ namespace }}"
+      gogs_route: "gogs-{{ namespace }}.{{ apps_hostname_suffix }}"
+      gogs_image_version: 0.11.34
+      gogs_admin_user: "{{ gogs_adm_user }}"
+      gogs_admin_password: "{{ gogs_admin_pwd }}"
+      gogs_password: "{{ gogs_gen_user_pwd }}"
+      gogs_generate_user_count: "{{ gogs_gen_user_count }}"
+      gogs_generate_user_format: "{{ gogs_gen_user_format }}"
+
+  - import_role:
+      name: openshift_workshopper
+    vars:
+      project_name: "{{ namespace }}"
+      workshopper_content_url_prefix: "https://raw.githubusercontent.com/{{ github_account }}/devops-guides/{{ github_ref }}"
+      workshopper_workshop_urls: "https://raw.githubusercontent.com/{{ github_account }}/devops-guides/{{ github_ref }}/_devops-workshop.yml"
+      workshopper_env_vars:
+        OPENSHIFT_URL: "{{ openshift_master_url }}"
+        PROJECT_SUFFIX: "{{ project_suffix }}"
+        COOLSTORE_PROJECT: coolstore{{ project_suffix }}
+        GIT_SERVER_URL: http://gogs-{{ namespace }}.{{ apps_hostname_suffix }}
+        OPENSHIFT_PASSWORD: "{{ openshift_user_password }}"
+        OPENSHIFT_USER: "{{ openshift_user_format }}"
+        GIT_USER: "{{ gogs_gen_user_format_display }}"
+        GIT_PASSWORD: "{{ gogs_gen_user_pwd }}"
+        OPENSHIFT_APPS_HOSTNAME: "{{ apps_hostname_suffix }}"
+
+  - name: create temporary git directory
+    tempfile:
+      state: directory
+      prefix: projects-git
+    register: git_dir
+
+  - name: unarchive projects source archive
+    unarchive:
+      remote_src: yes
+      src: "https://github.com/{{ github_account }}/devops-labs/archive/{{ github_ref }}.tar.gz"
+      dest: "{{ git_dir.path }}"
+
+  - name: init cart-service git repository
+    shell: |
+      git init
+      git add . --all
+      git config user.email "developer@rhdevops.com"
+      git config user.name "developer"
+      git commit -m "Initial add"
+      git push origin master
+    args:
+      chdir: "{{ git_dir.path }}/devops-oab-labs-{{ labs_github_ref }}/cart-spring-boot"
+
+  - name: create cart-service git repositories
+    uri:
+      url: http://gogs-{{ namespace }}.{{ apps_hostname_suffix }}/api/v1/user/repos
+      method: POST
+      body: '{"name": "cart-service", "private": false}'
+      body_format: json
+      user: "{{ item }}"
+      password: "{{ gogs_gen_user_pwd }}"
+      status_code: 200,201
+      force_basic_auth: true
+    with_sequence: start=1 end={{ gogs_gen_user_count|int }} format="{{ gogs_gen_user_format }}"
+    when: gogs_gen_user_count|int > 1
+    ignore_errors: true
+
+  - name: push cart-service to git repository
+    shell: "git push -f http://{{ item }}:{{ gogs_gen_user_pwd }}@gogs-{{ namespace }}.{{ apps_hostname_suffix }}/{{ item }}/cart-service.git master"
+    args:
+      chdir: "{{ git_dir.path }}/devops-oab-labs-{{ labs_github_ref }}/cart-spring-boot"
+    with_sequence: start=1 end={{ gogs_gen_user_count|int }} format="{{ gogs_gen_user_format }}"
+    when: gogs_gen_user_count|int > 1
+
+
+
+
+
+

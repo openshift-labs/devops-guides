@@ -1,0 +1,92 @@
+version: 1.0
+name: devops-workshop-apb
+description: APB to deploy required infra components for the DevOps Workshop on an OpenShift cluster
+bindable: False
+async: optional
+tags:
+- workshop
+metadata:
+  dependencies: []
+  displayName: "DevOps Workshop Installer"
+  longDescription: "Installs the required components (Git server, etc) for running the DevOps Workshop https://github.com/openshift-labs/devops-guides"
+  console.openshift.io/iconClass: "pficon pficon-process-automation"
+  providerDisplayName: "Red Hat, Inc."
+plans:
+  - name: default
+    description: Deploys DevOps Workshop Infrastructure
+    free: True
+    metadata:
+      displayName: Default
+    parameters:
+    - name: openshift_user
+      title: Username
+      description: Admin user is required for creating cluster resources
+      type: string
+      required: true
+      display_group: OpenShift Admin
+    - name: openshift_password
+      title: Password
+      description: Admin password is required for creating cluster resources
+      type: string
+      required: true
+      display_type: password
+      display_group: OpenShift Admin
+    - name: github_ref
+      title: Guides GitHub Reference
+      description: The GitHub reference for the Cloud-Native workshop lab guide
+      type: enum
+      enum: ["ocp-3.9"]
+      default: ocp-3.9
+      required: true
+      display_type: select
+      display_group: Lab Guide
+    - name: project_suffix
+      title: User Project Suffix
+      description: The pattern used in the lab guide to show the user projects e.g. coolstore-X 
+      type: string
+      default: "X"
+      required: true
+      display_group: Lab Guide
+    - name: gogs_adm_user
+      title: Admin User
+      description: Admin user for Gogs Git Server
+      type: string
+      default: "gogs"
+      required: true
+      display_group: Git Server
+    - name: gogs_admin_pwd
+      title: Admin Password
+      description: Password for Gogs admin user
+      type: string
+      default: "gogs"
+      required: true
+      display_group: Git Server
+    - name: gogs_gen_user_count
+      title: Generated User Count
+      description: Number of Gogs user to be created
+      type: int
+      default: 100
+      required: true
+      display_group: Git Server
+    - name: gogs_gen_user_format
+      title: Generated User Format
+      description: The printf format to be used when creating Gogs users. Read more https://en.wikipedia.org/wiki/Printf_format_string 
+      type: string
+      default: "user%d"
+      required: true
+      display_group: Git Server
+    - name: gogs_gen_user_format_display
+      title: Generated User Format (Display)
+      description: The Gogs username to be displayed in the lab guide
+      type: string
+      default: "userX"
+      required: true
+      display_group: Git Server
+    - name: gogs_gen_user_pwd
+      title: Generated User Password
+      description: Password for Gogs users created
+      type: string
+      default: "gogs"
+      required: true
+      display_group: Git Server
+      

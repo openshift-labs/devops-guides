@@ -1,4 +1,4 @@
-# DevOps Workshop on OpenShift
+# DevOps Workshop on OpenShift [![Build Status](https://travis-ci.org/openshift-labs/devops-guides.svg?branch=ocp-3.9)](https://travis-ci.org/openshift-labs/devops-guides)
 
 The DevOps Workshop provides full-stack and DevOps engineers an introduction to OpenShift and containers and how it can be used to build fully automated end-to-end deployment pipelines using advanced deployments techniques like rolling deploys and blue-green deployment.
 

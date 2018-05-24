@@ -31,9 +31,16 @@ plans:
       required: true
       display_type: password
       display_group: OpenShift Admin
+    - name: openshift_master_url
+      title: OpenShift Master URL
+      description: The address to OpenShift master URL to be displayed in the lab guide to participants
+      type: string
+      required: true
+      display_type: string
+      display_group: Lab Guide
     - name: github_ref
       title: Guides GitHub Reference
-      description: The GitHub reference for the Cloud-Native workshop lab guide
+      description: The GitHub reference for the DevOps workshop lab guide
       type: enum
       enum: ["ocp-3.9"]
       default: ocp-3.9

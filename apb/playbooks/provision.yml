@@ -3,6 +3,7 @@
   gather_facts: false
   connection: local
   vars:
+    openshift_master_url:
     openshift_admin_user: 
     openshift_admin_password: 
     openshift_token:
@@ -37,13 +38,6 @@
       openshift_token is none or
       openshift_token|trim() == ""
 
-  - name: extract openshift master url
-    shell: "oc whoami --show-server"
-    register: openshift_master_result
-
-  - set_fact:
-      openshift_master_url: "{{ openshift_master_result.stdout }}"
-          
   - name: extract app route suffix
     block:
       - openshift_v1_route:
@@ -96,6 +90,8 @@
         GIT_USER: "{{ gogs_gen_user_format_display }}"
         GIT_PASSWORD: "{{ gogs_gen_user_pwd }}"
         OPENSHIFT_APPS_HOSTNAME: "{{ apps_hostname_suffix }}"
+        ECLIPSE_CHE_URL: http://che-{{ namespace }}.{{ apps_hostname_suffix }}
+        NEXUS_URL: http://nexus-{{ namespace }}.{{ apps_hostname_suffix }}
 
   - import_role:
       name: openshift_eclipse_che
@@ -106,6 +102,7 @@
       route_suffix: "{{ apps_hostname_suffix }}"
       keycloak_openshift_user: admin
       keycloak_admin_pwd: admin
+      install_java_oc_stack: true
 
   - name: create temporary git directory
     tempfile:

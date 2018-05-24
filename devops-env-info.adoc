@@ -21,7 +21,7 @@ Password: `{{ GIT_PASSWORD }}` +
 
 **NEXUS MAVEN REPOSITORY**
 
-Web: {{ NEXUS_EXTERNAL_URL }}
+Web: {{ NEXUS_URL }}
 
 **ECLIPSE CHE IDE**
 

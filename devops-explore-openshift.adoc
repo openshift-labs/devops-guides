@@ -7,10 +7,11 @@ In this lab you will get familiar with OpenShift Web Console and OpenShift CLI a
 You can use the terminal on your workstation for running the OpenShift CLI commands, provided you {{OPENSHIFT_DOCS_BASE}}/cli_reference/get_started_cli.html[download the OpenShift CLI] and add it to your path.
 
 You might be familiar with the Eclipse IDE which is one of the most popular IDEs for Java and other
-programming languages. [Eclipse Che](https://www.eclipse.org/che/){:target="_blank"} is the next-generation Eclipse IDE which is web-based
+programming languages. https://www.eclipse.org/che/[Eclipse Che] is the next-generation Eclipse IDE which is web-based
 and gives you a full-featured IDE running in the cloud. You have an Eclipse Che instance deployed on the OpenShift cluster
-which you can use during these labs for creating files and running OpenShift CLI commands:
-{{ECLIPSE_CHE_URL}}
+which you can use during these labs for creating files and running OpenShift CLI commands.
+
+Eclipse Che: {{ECLIPSE_CHE_URL}}
 
 Register on Eclipse Che with any email and the same username as your OpenShift username, and the log in.
 

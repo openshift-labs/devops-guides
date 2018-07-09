@@ -12,12 +12,12 @@
     project_suffix: "X"
     github_account: openshift-labs
     github_ref: ocp-3.9
-    gogs_adm_user: gogs
-    gogs_adm_pwd: gogs
     gogs_gen_user_count: 100
     gogs_gen_user_format: user%d
     gogs_gen_user_format_display: userX
     gogs_gen_user_pwd: gogs
+    infrasvcs_adm_user: adminuser
+    infrasvcs_adm_pwd: adminpwd
   roles:
   - role: ansible.kubernetes-modules
     install_python_requirements: no
@@ -59,7 +59,7 @@
       name: openshift_sonatype_nexus
     vars:
       project_name: "{{ namespace }}"
-      nexus_image_version: 3.11.0
+      nexus_image_version: 3.12.1
       nexus_max_memory: 6Gi
 
   - import_role:
@@ -68,8 +68,8 @@
       project_name: "{{ namespace }}"
       gogs_route: "gogs-{{ namespace }}.{{ apps_hostname_suffix }}"
       gogs_image_version: 0.11.34
-      gogs_admin_user: "{{ gogs_adm_user }}"
-      gogs_admin_password: "{{ gogs_adm_pwd }}"
+      gogs_admin_user: "{{ infrasvcs_adm_user }}"
+      gogs_admin_password: "{{ infrasvcs_adm_pwd }}"
       gogs_password: "{{ gogs_gen_user_pwd }}"
       gogs_generate_user_count: "{{ gogs_gen_user_count }}"
       gogs_generate_user_format: "{{ gogs_gen_user_format }}"
@@ -97,11 +97,11 @@
       name: openshift_eclipse_che
     vars:
       project_name: "{{ namespace }}"
-      che_version: "6.5.0"
+      che_version: "6.7.1"
       multi_user: true
       route_suffix: "{{ apps_hostname_suffix }}"
-      keycloak_openshift_user: admin
-      keycloak_admin_pwd: admin
+      keycloak_admin_user: "{{ infrasvcs_adm_user }}"
+      keycloak_admin_pwd: "{{ infrasvcs_adm_pwd }}"
       install_java_oc_stack: true
 
   - name: create temporary git directory

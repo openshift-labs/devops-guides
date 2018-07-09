@@ -23,14 +23,14 @@ plans:
       description: Admin user is required for creating cluster resources
       type: string
       required: true
-      display_group: OpenShift Admin
+      display_group: OpenShift Admin User
     - name: openshift_admin_password
       title: Password
       description: Admin password is required for creating cluster resources
       type: string
       required: true
       display_type: password
-      display_group: OpenShift Admin
+      display_group: OpenShift Admin User
     - name: openshift_master_url
       title: OpenShift Master URL
       description: The address to OpenShift master URL to be displayed in the lab guide to participants
@@ -38,60 +38,32 @@ plans:
       required: true
       display_type: string
       display_group: Lab Guide
-    - name: github_ref
-      title: Guides GitHub Reference
-      description: The GitHub reference for the DevOps workshop lab guide
-      type: enum
-      enum: ["ocp-3.9"]
-      default: ocp-3.9
-      required: true
-      display_type: select
-      display_group: Lab Guide
-    - name: project_suffix
-      title: User Project Suffix
-      description: The pattern used in the lab guide to show the user projects e.g. coolstore-X 
+    - name: infrasvcs_adm_user
+      title: Infra Services Admin User
+      description: Admin user for infrastructure services (Gogs, Che, ...)
       type: string
-      default: "X"
+      default: "adminuser"
       required: true
-      display_group: Lab Guide
-    - name: gogs_adm_user
-      title: Admin User
-      description: Admin user for Gogs Git Server
+      display_type: text
+      display_group: Workshop Infra Services
+    - name: infrasvcs_adm_pwd
+      title: Infra Services Admin Password
+      description: Admin password for infrastructure services (Gogs, Che, ...)
       type: string
-      default: "gogs"
+      default: "adminpwd"
       required: true
-      display_group: Git Server
-    - name: gogs_adm_pwd
-      title: Admin Password
-      description: Password for Gogs admin user
-      type: string
-      default: "gogs"
-      required: true
-      display_group: Git Server
+      display_type: text
+      display_group: Workshop Infra Services
     - name: gogs_gen_user_count
-      title: Generated User Count
+      title: Number of Users
       description: Number of Gogs user to be created
       type: int
       default: 100
       required: true
       display_group: Git Server
-    - name: gogs_gen_user_format
-      title: Generated User Format
-      description: The printf format to be used when creating Gogs users. Read more https://en.wikipedia.org/wiki/Printf_format_string 
-      type: string
-      default: "user%d"
-      required: true
-      display_group: Git Server
-    - name: gogs_gen_user_format_display
-      title: Generated User Format (Display)
-      description: The Gogs username to be displayed in the lab guide
-      type: string
-      default: "userX"
-      required: true
-      display_group: Git Server
     - name: gogs_gen_user_pwd
-      title: Generated User Password
-      description: Password for Gogs users created
+      title: User Password
+      description: Password for Gogs users
       type: string
       default: "gogs"
       required: true

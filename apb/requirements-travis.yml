@@ -11,7 +11,7 @@
   name: openshift_workshopper
 
 - src: siamaksade.openshift_eclipse_che
-  version: ocp-3.9-1
+  version: ocp-3.9-2
   name: openshift_eclipse_che
 
 - src: ansible.kubernetes-modules

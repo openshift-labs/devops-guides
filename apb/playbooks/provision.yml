@@ -85,6 +85,7 @@
         PROJECT_SUFFIX: "{{ project_suffix }}"
         COOLSTORE_PROJECT: coolstore{{ project_suffix }}
         GIT_SERVER_URL: http://gogs-{{ namespace }}.{{ apps_hostname_suffix }}
+        GIT_SERVER_INTERNAL_URL: http://gogs-{{ namespace }}.svc:3000
         OPENSHIFT_PASSWORD: "{{ openshift_user_password }}"
         OPENSHIFT_USER: "{{ openshift_user_format }}"
         GIT_USER: "{{ gogs_gen_user_format_display }}"

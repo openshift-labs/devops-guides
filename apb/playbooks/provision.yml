@@ -85,14 +85,14 @@
         PROJECT_SUFFIX: "{{ project_suffix }}"
         COOLSTORE_PROJECT: coolstore{{ project_suffix }}
         GIT_SERVER_URL: http://gogs-{{ namespace }}.{{ apps_hostname_suffix }}
-        GIT_SERVER_INTERNAL_URL: http://gogs.{{ namespace }}.svc:3000
+        GIT_SERVER_INTERNAL_URL: http://gogs.{{ namespace }}.svc.cluster.local:3000
         OPENSHIFT_PASSWORD: "{{ openshift_user_password }}"
         OPENSHIFT_USER: "{{ openshift_user_format }}"
         GIT_USER: "{{ gogs_gen_user_format_display }}"
         GIT_PASSWORD: "{{ gogs_gen_user_pwd }}"
         OPENSHIFT_APPS_HOSTNAME: "{{ apps_hostname_suffix }}"
         ECLIPSE_CHE_URL: http://che-{{ namespace }}.{{ apps_hostname_suffix }}
-        NEXUS_URL: http://nexus-{{ namespace }}.{{ apps_hostname_suffix }}
+        NEXUS_URL: http://nexus.{{ namespace }}.svc.cluster.local:8081/repository/maven-public
 
   - import_role:
       name: openshift_eclipse_che

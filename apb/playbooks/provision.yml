@@ -92,7 +92,7 @@
         GIT_PASSWORD: "{{ gogs_gen_user_pwd }}"
         OPENSHIFT_APPS_HOSTNAME: "{{ apps_hostname_suffix }}"
         ECLIPSE_CHE_URL: http://che-{{ namespace }}.{{ apps_hostname_suffix }}
-        NEXUS_URL: http://nexus.{{ namespace }}.svc.cluster.local:8081/repository/maven-public
+        NEXUS_URL: http://nexus.{{ namespace }}.svc.cluster.local:8081/repository/maven-all-public
 
   - import_role:
       name: openshift_eclipse_che

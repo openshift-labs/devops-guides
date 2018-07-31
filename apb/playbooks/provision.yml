@@ -92,7 +92,8 @@
         GIT_PASSWORD: "{{ gogs_gen_user_pwd }}"
         OPENSHIFT_APPS_HOSTNAME: "{{ apps_hostname_suffix }}"
         ECLIPSE_CHE_URL: http://che-{{ namespace }}.{{ apps_hostname_suffix }}
-        NEXUS_URL: http://nexus.{{ namespace }}.svc.cluster.local:8081/repository/maven-all-public
+        NEXUS_URL: http://nexus-{{ namespace }}.{{ apps_hostname_suffix }}
+        NEXUS_INTERNAL_URL: http://nexus.{{ namespace }}.svc.cluster.local:8081
 
   - import_role:
       name: openshift_eclipse_che
@@ -147,3 +148,9 @@
       chdir: "{{ git_dir.path }}/devops-labs-{{ github_ref }}/cart-spring-boot"
     with_sequence: start=1 end={{ gogs_gen_user_count|int }} format="{{ gogs_gen_user_format }}"
     when: gogs_gen_user_count|int > 1
+
+  - name: Install Catalog Build templates in openshift namespace
+    command: oc create -f https://raw.githubusercontent.com/{{ github_account }}/devops-labs/{{ github_ref }}/openshift/coolstore-build-template.yaml  -n openshift
+
+  - name: Create Images in openshift namespace
+    command: oc new-app coolstore-builds -p MAVEN_MIRROR_URL=http://nexus.{{ namespace }}.svc.cluster.local:8081 -p BUILD_TAG=prod -n openshift

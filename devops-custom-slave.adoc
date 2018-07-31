@@ -95,12 +95,12 @@ pipeline {
     stage('Build') {
       steps {
         git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
-        sh "gradle build
+        sh "gradle build"
       }
     }
     stage('Test') {
       steps {
-        sh "gradle test
+        sh "gradle test"
       }
     }
   }
@@ -127,12 +127,12 @@ spec:
             stage('Build') {
               steps {
                 git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
-                sh "gradle build
+                sh "gradle build"
               }
             }
             stage('Test') {
               steps {
-                sh "gradle test
+                sh "gradle test"
               }
             }
           }

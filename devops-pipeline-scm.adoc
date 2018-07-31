@@ -104,7 +104,7 @@ You can now create an OpenShift Pipeline and refer the pipelines Git repository 
 
 [source,shell]
 ----
-$ oc new-app . --name=cart-pipeline-git --strategy=pipeline
+$ oc new-app . --name=cart-pipeline-git --strategy=pipeline --build-env=NEXUS_URL={{NEXUS_INTERNAL_URL}}/repository/maven-all-public
 ----
 
 Click on *Builds -> Pipelines* on the left sidebar menu. A new instance of the *cart-pipeline-git* pipeline has started running using your Jenkinsfile from the Git repository.

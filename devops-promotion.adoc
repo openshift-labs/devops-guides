@@ -31,48 +31,15 @@ image::devops-intro-coolstore-arch.png[CoolStore Architecture]
 
 In this lab, however, you are the whole team! Therefore you should build the images for once so that you can use them for the rest of the lab and deploy them in the production environment.
 
-Install the following templates so that you can use one for building the images, and the other for deploying the production images which in real scenarios will be already available in the registry.
+Install the following template so that you can deploy the production images from the registry.
 
 [source,shell]
 ----
 $ oc project prod-{{PROJECT_SUFFIX}}
-$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/ocp-3.9/openshift/coolstore-build-template.yaml 
 $ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/ocp-3.9/openshift/coolstore-deployment-template.yaml 
 ----
 
-Now click on *Add to project* and *Select from Project* in order to use the build template for creating the production images
-
-image::devops-promotion-select-from-project.png[Select from Project]
-
-The two templates you just created are available in the catalog.
-
-image::devops-promotion-select-from-project-templates.png[Project Catalog]
-
-Click on *CoolStore Builds* and then *Next* and again *Next*. Specify the following in the fields and then click on *Create*.
-
-* Maven mirror url: {{NEXUS_URL}}
-* Build Tag: `prod`
-
-This will tell the template to store the built images with the `prod` tag, since we want to use them in the production.
-
-image::devops-promotion-build-template.png[CoolStore Build Template]
-
-This templates creates a buildconfig for each image you need and starts building the components. As soon as builds are complete, the images will be pushed into the OpenShift integrated registry with the `prod` tag as specified via a parameter in the above 
-command. 
-
-Click on *Builds* &rarr; *Builds* to see the list of build configs as they build is in progress.
-
-image::devops-promotion-builds.png[Image Builds]
-
-After the builds are complete, you won't need the build configs any more. Like mentioned before, these images would really come from other teams but since you are a one-man team, you just built them yourself. If you want, you could clean up the production environment and remove the build configs.
-
-[source,shell]
-----
-$ oc project prod-{{PROJECT_SUFFIX}}
-$ oc delete bc --all
-----
-
-Now that you have the images, you can go ahead and deploy the CoolStore application in production using the newly built images. In the _Prod_ project, click on *Add to project* and *Select from Project* again. Choose the *CoolStore Deployments* template this time and then *Next* and again *Next*.
+You can go ahead and deploy the CoolStore application in production. In the _Prod_ project, click on *Add to project* and *Select from Project*. Choose the *CoolStore Deployments* template and then *Next* and again *Next*.
 
 If you remember, the Cart route hostname was generated for you in the *Cart Dev* project with the format: `cart-dev-{{PROJECT_SUFFIX}}.<HOSTNAME>`. Specify the *Hostname Suffix* in the form by replacing `cart-dev-{{PROJECT_SUFFIX}}` in that generated format with `prod-{{PROJECT_SUFFIX}}`, so that the value of *Hostname Suffix* would be `prod-{{PROJECT_SUFFIX}}.<HOSTNAME>`
 

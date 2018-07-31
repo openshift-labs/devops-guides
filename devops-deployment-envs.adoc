@@ -64,7 +64,7 @@ image::devops-envs-cart-newapp.png[Deploy Cart Service]
 Click on *advanced options* to review advanced options for setting memory and cpu limits, environment variables, scaling and more when deploying an application. In this lab, similar to most development teams a Maven artifact repository (e.g. Sonatype Nexus and Artifactory) is used for managing Maven artifacts. Add the following environment variable under *Build Configuration* to specify the Maven repository manager URL to be used during the build phase:
 
 * Name: `MAVEN_MIRROR_URL`
-* Value: `{{NEXUS_URL}}`
+* Value: `{{NEXUS_INTERNAL_URL}}/repository/maven-all-public`
 
 Note that the Maven repository manager URL is an internal URL and is not accessible externally. Click on *Create* button and then on *Continue to the project overview.*.
 
@@ -130,7 +130,7 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 ----
 $ oc new-app redhat-openjdk18-openshift:1.2~{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git \
     --name=cart \
-    --build-env=MAVEN_MIRROR_URL={{NEXUS_URL}}
+    --build-env=MAVEN_MIRROR_URL={{NEXUS_INTERNAL_URL}}/repository/maven-all-public
 
 --> Found image 56cfa0a (6 weeks old) in image stream "openshift/redhat-openjdk18-openshift" under tag "1.2" for "redhat-openjdk18-openshift:1.2"
 

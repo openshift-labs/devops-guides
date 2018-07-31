@@ -71,9 +71,9 @@ oc expose svc/guides
 Clone the git repository and run the following inside the working copy directory:
 
 ```
-docker run -p 8080:8080 \
+docker run -it --rm -p 8080:8080 \
               -v $(pwd):/app-data \
               -e CONTENT_URL_PREFIX="file:///app-data" \
               -e WORKSHOPS_URLS="file:///app-data/_devops-workshop.yml" \
-              osevg/workshopper:latest
+              quay.io/osevg/workshopper:latest
 ```

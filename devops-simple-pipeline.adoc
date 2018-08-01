@@ -69,7 +69,7 @@ spec:
                 script {
                   openshift.withCluster() {
                     openshift.withProject() {
-                      openshift.startBuild("cart", "--follow")
+                      openshift.startBuild("cart").logs("-f")
                     }
                   }
                 }

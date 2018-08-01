@@ -19,10 +19,23 @@ Let’s start with cloning the `cart-service` Git repository where you will stor
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
+[TIP]
+====
+If you are using Eclipse Che, click on **Import Project...** and then enter the Git url 
+as the `URL` and click on **Import**. Make sure to replace your username and password in the 
+Git url:
+
+http://{{GIT_USER}}:{{GIT_PASSWORD}}@{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git
+
+Choose **Java > Maven** as the project type and click on **Save**. 
+ 
+You can now right-click on the **cart-service** project and click on **New > File** to create the `Jenkinsfile`
+====
+
 [source,shell]
 ----
 $ cd
-$ git clone {{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git
+$ git clone http://{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git
 $ cd cart-service
 $ touch Jenkinsfile
 ----
@@ -104,6 +117,7 @@ You can now create an OpenShift Pipeline and refer the pipelines Git repository 
 
 [source,shell]
 ----
+$ oc project dev--{{PROJECT_SUFFIX}}
 $ oc new-app . --name=cart-pipeline-git --strategy=pipeline --build-env=NEXUS_URL={{NEXUS_INTERNAL_URL}}
 ----
 

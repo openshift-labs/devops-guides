@@ -8,14 +8,14 @@
     openshift_admin_password: 
     openshift_token:
     openshift_user_format: userX
-    openshift_user_password:
+    openshift_user_password: openshift
     project_suffix: "X"
     github_account: openshift-labs
     github_ref: ocp-3.10
     gogs_gen_user_count: 100
     gogs_gen_user_format: user%d
     gogs_gen_user_format_display: userX
-    gogs_gen_user_pwd: gogs
+    gogs_gen_user_pwd: openshift
     infrasvcs_adm_user: adminuser
     infrasvcs_adm_pwd: adminpwd
   roles:
@@ -84,8 +84,8 @@
         OPENSHIFT_URL: "{{ openshift_master_url }}"
         PROJECT_SUFFIX: "{{ project_suffix }}"
         COOLSTORE_PROJECT: coolstore{{ project_suffix }}
-        GIT_SERVER_URL: http://gogs-{{ namespace }}.{{ apps_hostname_suffix }}
-        GIT_SERVER_INTERNAL_URL: http://gogs.{{ namespace }}.svc.cluster.local:3000
+        GIT_SERVER_URL: gogs-{{ namespace }}.{{ apps_hostname_suffix }}
+        GIT_SERVER_INTERNAL_URL: gogs.{{ namespace }}.svc.cluster.local:3000
         OPENSHIFT_PASSWORD: "{{ openshift_user_password }}"
         OPENSHIFT_USER: "{{ openshift_user_format }}"
         GIT_USER: "{{ gogs_gen_user_format_display }}"

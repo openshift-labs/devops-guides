@@ -14,7 +14,7 @@ IMPORTANT: Replace `{{ PROJECT_SUFFIX }}` with the id given to you by the instru
 
 **GIT SERVER**
 
-Web: {{ GIT_SERVER_URL }}
+Web: http://{{ GIT_SERVER_URL }}
 
 Username: `{{ GIT_USER }}` + 
 Password: `{{ GIT_PASSWORD }}` + 

@@ -143,7 +143,7 @@ $ curl http://{{CART_GREEN_ROUTE}}/api/cart/dummy
 
 Showtime! Let’s perform your first blue/green deployment. Point your browser to Git server web URL and log in (you should be already logged in by now!) with your credentials:
 
-* Git server: `{{GIT_SERVER_URL}}`
+* Git server: `http://{{GIT_SERVER_URL}}`
 * Username: `{{GIT_USER}}`
 * Password: `{{GIT_PASSWORD}}`
 

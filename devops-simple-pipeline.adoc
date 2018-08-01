@@ -24,7 +24,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        git url: '{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git'
+        git url: 'http://{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git'
         sh 'mvn package'
       }
     }
@@ -69,7 +69,7 @@ spec:
                 script {
                   openshift.withCluster() {
                     openshift.withProject() {
-                      openshift.startBuild("cart", "--follow")
+                      openshift.startBuild("cart").logs('-f')
                     }
                   }
                 }

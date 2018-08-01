@@ -65,7 +65,7 @@ plans:
       title: User Password
       description: Password for Gogs users
       type: string
-      default: "gogs"
+      default: "openshift"
       required: true
       display_group: Git Server
       

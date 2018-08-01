@@ -94,7 +94,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
+        git url: "http://{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
         sh "gradle build"
       }
     }
@@ -126,7 +126,7 @@ spec:
           stages {
             stage('Build') {
               steps {
-                git url: "{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
+                git url: "http://{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git"
                 sh "gradle build"
               }
             }

@@ -32,7 +32,7 @@ image::devops-envs-dev-project.png[Dev Project]
 
 By default, the current user who created the project is the _admin_ for this project. The OpenShift cluster admins or the project admins can define granular access control on the project and control how can view, modify or deploying applications in each project. This is particularly essential for example when you want developers to be able to view the _Prod_ environments and get debug information without allowing them to modify the state of those environments. In order to review the access control on the _Dev_ project, click on *Resources -> Membership* on the left sidebar menu. Note that the current user has the _admin_ role.
 
-image::devops-envs-dev-membership.png[Project Access Control]
+image::devops-envs-dev-membership.png[Project Access Control, width=800]
 
 Now, let’s deploy the Spring Boot application, Cart service, into the Dev environment. OpenShift supports deploying containerized apps in three different ways and allows developer to pick the process that is most suitable for their projects:
 
@@ -50,16 +50,16 @@ In this lab, you will use the S2I mechanism for building the Cart service from s
 
 Enter _jdk_ in the text field in order to find the *Red Hat OpenJDK 1.8* language runtime, and then click on the one that shows https://www.oracle.com/java/duke.html[duke, the java mascot].
 
-image::devops-envs-catalog-jdk.png[OpenJDK Base Image]
+image::devops-envs-catalog-jdk.png[OpenJDK Base Image, width=800]
 
 Now that you have chosen the Java language runtime, you can enter the URL to the Cart service application source code to specify it as an input to the S2I process. Click *Next* and enter the following in the text fields:
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
   * Name: `cart`
-  * Git URL: `{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git`
+  * Git URL: `http://{{GIT_SERVER_INTERNAL_URL}}/{{GIT_USER}}/cart-service.git`
 
-image::devops-envs-cart-newapp.png[Deploy Cart Service]
+image::devops-envs-cart-newapp.png[Deploy Cart Service, width=800]
 
 Click on *advanced options* to review advanced options for setting memory and cpu limits, environment variables, scaling and more when deploying an application. In this lab, similar to most development teams a Maven artifact repository (e.g. Sonatype Nexus and Artifactory) is used for managing Maven artifacts. Add the following environment variable under *Build Configuration* to specify the Maven repository manager URL to be used during the build phase:
 
@@ -72,15 +72,15 @@ All required resources are created in order to build and deploy the Cart service
 
 In the project overview, the Cart service S2I build process is running to build first the application JAR file and then a docker image by layering the JAR file on the OpenJDK base image.
 
-image::devops-envs-cart-build.png[Create Cart Service]
+image::devops-envs-cart-build.png[Create Cart Service, width=900]
 
 You can see the build logs as build is making progress. If you want to see the full logs, click on *View Log* link to see the build logs in a larger window. You can click on the *Follow* link to follow the logs in the browser.
 
-image::devops-envs-cart-build-logs.png[Build Logs]
+image::devops-envs-cart-build-logs.png[Build Logs, width=900]
 
 When the build finishes and the application docker image is created, the docker image is pushed by default to OpenShift internal registry and then deployed to OpenShift. Builds also support pushing the built image to other image registries outside OpenShift.
 
-image::devops-envs-cart-deployed.png[Create Cart Service]
+image::devops-envs-cart-deployed.png[Create Cart Service, width=800]
 
 OpenShift uses {{OPENSHIFT_DOCS_BASE}}/dev_guide/application_health.html[container health checks] to detect and handle or heal unhealthy containers which is not set yet on the deployed Cart service. OpenShift runs the following probes to manage the container and application health:
 
@@ -94,7 +94,7 @@ There are multiple ways to check a container liveness and readiness. You can def
 * Port: `8080`
 * Initial Delay: `15`
 
-image::devops-envs-cart-healthchecks.png[Create Cart Service]
+image::devops-envs-cart-healthchecks.png[Create Cart Service, width=900]
 
 Wait till the Cart service is re-deployed with the new health check configurations and then verify that the Cart service is functioning by pointing your browser to the Cart service REST endpoint.
 
@@ -128,7 +128,7 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 [source,shell]
 ----
-$ oc new-app redhat-openjdk18-openshift:1.2~{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git \
+$ oc new-app redhat-openjdk18-openshift:1.2~http://{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git \
     --name=cart \
     --build-env=MAVEN_MIRROR_URL={{NEXUS_INTERNAL_URL}}/repository/maven-all-public
 
@@ -140,7 +140,7 @@ $ oc new-app redhat-openjdk18-openshift:1.2~{{GIT_SERVER_URL}}/{{GIT_USER}}/cart
 
     Tags: builder, java
 
-    * A source build using source code from {{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git will be created
+    * A source build using source code from http://{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git will be created
       * The resulting image will be pushed to image stream "cart:latest"
       * Use 'start-build' to trigger a new build
     * This image will be deployed in deployment config "cart"

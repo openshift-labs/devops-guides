@@ -18,7 +18,7 @@ Go to Gogs web by pointing your browser at Gogs URL and login using your credent
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 
-* Gogs URL:  `{{GIT_SERVER_URL}}`
+* Gogs URL:  `http://{{GIT_SERVER_URL}}`
 * Username: `{{GIT_USER}}`
 * Password: `{{GIT_PASSWORD}}`
 

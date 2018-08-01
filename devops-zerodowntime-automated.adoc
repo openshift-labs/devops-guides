@@ -140,7 +140,7 @@ The purchase reports from CoolStore online shop show that reducing the minimum o
 
 Point your browser to the Git server web URL:
 
-* Git Server URL:  {{GIT_SERVER_URL}}
+* Git Server URL:  http://{{GIT_SERVER_URL}}
 * Username: {{GIT_USER}}
 * Password: {{GIT_PASSWORD}}
 

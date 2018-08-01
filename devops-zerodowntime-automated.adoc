@@ -38,7 +38,7 @@ pipeline {
         script {
           openshift.withCluster() {
             openshift.withProject() {
-              openshift.startBuild("cart", "--from-file=target/cart.jar", "--follow")
+              openshift.startBuild("cart", "--from-file=target/cart.jar").logs("-f")
             }
           }
         }
@@ -52,7 +52,7 @@ pipeline {
               dc = openshift.selector("dc", "cart")
               dc.rollout().latest()
               timeout(10) {
-                  dc.rollout().status("-w")
+                  dc.rollout().status()
               }
             }
           }
@@ -125,8 +125,8 @@ Notice that in the Promote stage, the pipeline retrieves the Cart route to check
 
 Save the Jenkinsfile and push it to the Git repository and enter your credentials:
 
-* Username: {{GIT_USER}}
-* Password: {{GIT_PASSWORD}}
+* Username: `{{GIT_USER}}`
+* Password: `{{GIT_PASSWORD}}`
 
 [source,shell]
 ----
@@ -140,9 +140,9 @@ The purchase reports from CoolStore online shop show that reducing the minimum o
 
 Point your browser to the Git server web URL:
 
-* Git Server URL:  http://{{GIT_SERVER_URL}}
-* Username: {{GIT_USER}}
-* Password: {{GIT_PASSWORD}}
+* Git Server URL:  `http://{{GIT_SERVER_URL}}`
+* Username: `{{GIT_USER}}`
+* Password: `{{GIT_PASSWORD}}`
 
 In the *cart-service* repository, browse to the promotion service at `src/main/java/com/redhat/coolstore/service/PromoService.java`, click on the pencil icon to open `PromoService.java` in the web editor and set the minimum order to 20$. The `PromoService.java` should look like this after the edit:
 

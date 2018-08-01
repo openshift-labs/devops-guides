@@ -51,9 +51,9 @@ Click on *Create*, and then on *Continue to overview*. You will notice that all 
 
 image::devops-promotion-coolstore-deployed.png[CoolStore Webshop Containers]
 
-Although Cart is deployed, let's replace it with the the image Cart service that is running in the Dev environment through promoting the Cart container image from _Dev_ environment to _Prod_ environment. The reason for doing so is to guarantee that the container image that runs in Prod environment is the same image that is running and has been tested in the Dev environment.
+Let's promote Cart container image that is running in the _Dev_ environment to _Prod_ environment. The reason for doing so is to guarantee that the container image that runs in Prod environment is the same image that is running and has been tested in the Dev environment.
 
-Uou can use the `oc tag` CLI command for promoting images between environments.
+You can use the `oc tag` CLI command for promoting images between environments.
 
 CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the instructor.
 

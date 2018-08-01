@@ -128,11 +128,11 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 [source,shell]
 ----
-$ oc new-app redhat-openjdk18-openshift:1.2~http://{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git \
+$ oc new-app java:8~http://{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git \
     --name=cart \
     --build-env=MAVEN_MIRROR_URL={{NEXUS_INTERNAL_URL}}/repository/maven-all-public
 
---> Found image 56cfa0a (6 weeks old) in image stream "openshift/redhat-openjdk18-openshift" under tag "1.2" for "redhat-openjdk18-openshift:1.2"
+--> Found image 56cfa0a (6 weeks old) in image stream "openshift/java" under tag "8" for "java:8"
 
     Java Applications
     -----------------

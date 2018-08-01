@@ -11,7 +11,7 @@
     openshift_user_password:
     project_suffix: "X"
     github_account: openshift-labs
-    github_ref: ocp-3.9
+    github_ref: ocp-3.10
     gogs_gen_user_count: 100
     gogs_gen_user_format: user%d
     gogs_gen_user_format_display: userX

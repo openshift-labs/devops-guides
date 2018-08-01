@@ -1,4 +1,4 @@
-# DevOps Workshop on OpenShift [![Build Status](https://travis-ci.org/openshift-labs/devops-guides.svg?branch=ocp-3.9)](https://travis-ci.org/openshift-labs/devops-guides)
+# DevOps Workshop on OpenShift [![Build Status](https://travis-ci.org/openshift-labs/devops-guides.svg?branch=ocp-3.10)](https://travis-ci.org/openshift-labs/devops-guides)
 
 The DevOps Workshop provides full-stack and DevOps engineers an introduction to OpenShift and containers and how it can be used to build fully automated end-to-end deployment pipelines using advanced deployments techniques like rolling deploys and blue-green deployment.
 
@@ -32,13 +32,13 @@ as cluster admin and perform the following in the `openshift-ansible-service-bro
     - name: dh
       type: dockerhub
       org: openshiftapb
-      tag: ocp-3.9
+      tag: ocp-3.10
       white_list: [.*-apb$]
   ```
 
 2. Redeploy the `asb` deployment
 
-You can [read more in the docs](https://docs.openshift.com/container-platform/3.9/install_config/oab_broker_configuration.html#oab-config-registry-dockerhub) 
+You can [read more in the docs](https://docs.openshift.com/container-platform/3.10/install_config/oab_broker_configuration.html#oab-config-registry-dockerhub) 
 on how to configure the service catalog.
 
 Note that if you are using the _OpenShift Workshop_ in RHPDS, this APB is already available in your service catalog.
@@ -50,9 +50,21 @@ As an alternative, you can also run the APB directly in a pod on OpenShift to in
 ```
 oc login
 oc new-project lab-infra
-oc run apb --restart=Never --image="openshiftapb/devops-workshop-apb:ocp-3.9" \
+oc run apb --restart=Never --image="openshiftapb/devops-workshop-apb:ocp-3.10" \
     -- provision -vvv -e namespace=$(oc project -q) -e openshift_token=$(oc whoami -t)
 
+```
+
+Or if you have Ansible installed locally, you can also run the Ansilbe playbooks directly on your machine:
+
+```
+oc login
+oc new-project lab-infra
+
+ansible-playbook -vvv playbooks/provision.yml \
+       -e namespace=$(oc project -q) \
+       -e openshift_token=$(oc whoami -t) \
+       -e openshift_master_url=$(oc whoami --show-server)
 ```
 
 ## Lab Instructions on OpenShift
@@ -61,8 +73,8 @@ Note that if you have used the above workshop installer, the lab instructions ar
 
 ```
 oc new-app osevg/workshopper:latest --name=guides \
-    -e CONTENT_URL_PREFIX=https://raw.githubusercontent.com/openshift-labs/devops-guides/ocp-3.9 \
-    -e WORKSHOPS_URLS=https://raw.githubusercontent.com/openshift-labs/devops-guides/ocp-3.9/_devops-workshop.yml
+    -e CONTENT_URL_PREFIX=https://raw.githubusercontent.com/openshift-labs/devops-guides/ocp-3.10 \
+    -e WORKSHOPS_URLS=https://raw.githubusercontent.com/openshift-labs/devops-guides/ocp-3.10/_devops-workshop.yml
 oc expose svc/guides
 ```
 

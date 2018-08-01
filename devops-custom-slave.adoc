@@ -26,7 +26,7 @@ The certified Jenkins image provided by OpenShift also provides auto-discovery a
 Note that this scanning is only performed once, when the Jenkins master is starting.
 
 After Maven, Gradle is one of the popular build tools for Java projects. Let’s build a new slave image to enable Jenkins to run Gradle builds.
-Due to similarities between Maven and Gradle, the simplest way to start is to create a Dockerfile and build upon the Maven slave image. Here is the content of the https://github.com/openshift-labs/devops-labs/lab-10/blob/ocp-3.9/Dockerfile[Dockerfile on GitHub] for building the Gradle slave image:
+Due to similarities between Maven and Gradle, the simplest way to start is to create a Dockerfile and build upon the Maven slave image. Here is the content of the https://github.com/openshift-labs/devops-labs/lab-10/blob/ocp-3.10/Dockerfile[Dockerfile on GitHub] for building the Gradle slave image:
 
 [source,shell]
 ----
@@ -47,7 +47,7 @@ You can build the docker image on OpenShift by creating a new build from the Git
 [source,shell]
 ----
 $ oc project ci
-$ oc new-build https://github.com/openshift-labs/devops-labs.git#ocp-3.9 --name=jenkins-slave-gradle-rhel7 --context-dir=solutions/lab-10
+$ oc new-build https://github.com/openshift-labs/devops-labs.git#ocp-3.10 --name=jenkins-slave-gradle-rhel7 --context-dir=solutions/lab-10
 $ oc logs -f bc/jenkins-slave-gradle-rhel7 
 ----
 

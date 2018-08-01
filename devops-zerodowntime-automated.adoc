@@ -38,7 +38,7 @@ pipeline {
         script {
           openshift.withCluster() {
             openshift.withProject() {
-              openshift.startBuild("cart", "--from-file=target/cart.jar", "--follow")
+              openshift.startBuild("cart", "--from-file=target/cart.jar").logs(-f")
             }
           }
         }
@@ -52,7 +52,7 @@ pipeline {
               dc = openshift.selector("dc", "cart")
               dc.rollout().latest()
               timeout(10) {
-                  dc.rollout().status("-w")
+                  dc.rollout().status()
               }
             }
           }

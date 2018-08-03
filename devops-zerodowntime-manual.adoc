@@ -43,7 +43,7 @@ In order to create the blue and green Cart service and deployment configs, we ca
 
 [source,shell]
 ----
-$ oc export svc/cart dc/cart -o yaml > ~/cart-blue.yaml
+$ oc get svc/cart dc/cart -o yaml --export > ~/cart-blue.yaml
 ----
 
 Open the `cart-blue.yaml` file in a text editor and replace all occurrences of `cart` with `cart-blue`. After replacement, make sure the referenced image tag is `cart:prod-blue` which you created in the previous steps:

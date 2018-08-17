@@ -31,7 +31,7 @@ Due to similarities between Maven and Gradle, the simplest way to start is to cr
 [source,shell]
 ----
 FROM openshift3/jenkins-slave-maven-rhel7
-ENV GRADLE_VERSION=3.4.1
+ENV GRADLE_VERSION=4.9
 USER root
 RUN curl -skL -o /tmp/gradle-bin.zip https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip && \
     mkdir -p /opt/gradle && \

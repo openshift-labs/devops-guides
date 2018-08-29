@@ -106,6 +106,15 @@
       keycloak_admin_pwd: "{{ infrasvcs_adm_pwd }}"
       install_java_oc_stack: true
 
+  - import_role:
+      name: openshift_jenkins
+    vars:
+      update_jenkins_templates: true
+      jenkins_template_disable_admin_monitors: true
+      deploy_jenkins: false
+      jenkins_max_cpu: 2
+      jenkins_max_mem: 2Gi
+
   - name: create temporary git directory
     tempfile:
       state: directory

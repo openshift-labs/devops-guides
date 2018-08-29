@@ -13,3 +13,7 @@
 - src: siamaksade.openshift_eclipse_che
   version: ocp-3.10
   name: openshift_eclipse_che
+
+- src: siamaksade.openshift_jenkins
+  version: ocp-3.10-1
+  name: openshift_jenkins

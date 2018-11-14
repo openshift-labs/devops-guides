@@ -94,11 +94,7 @@ $ oc create -f ~/cart-blue.yaml
 $ oc create -f ~/cart-green.yaml
 ----
 
-Now that the Cart Blue and Cart Green deployment and services are defined, you can deploy those containers in the Prod environment. Click on *Applications -> Deployments* and then on *cart-blue*. Deploy the Cart Blue service by clicking on the *Deploy* button. Go back to the list of deployments and click on *cart-green*, and then *Deploy* button to also deploy the Cart Green service.
-
 The Cart Blue and Green containers will be deployed alongside the previous Cart container.
-
-image::devops-zerodowntime-cart-bluegreen.png[Cart Blue Service and Cart Green Service]
 
 You created the Cart blue and green services but the route is still pointing to the old container instead of either blue or the green container.
 Click on *Applications -> Routes* on the left sidebar menu and then click on *cart* route. Notice that it is currently pointing at the cart service. Click on *Actions* &rarr; *Edit* from the top-right menu. You can create a blue/green route by clicking on *Split traffic across multiple services* and adding `cart-blue` and `cart-green` services with 100 and 0 weight respectively to send all traffic to the cart-blue service and then click on *Save*. You can {{OPENSHIFT_DOCS_BASE}}/dev_guide/routes.html#routes-load-balancing-for-AB-testing[split the traffic] coming to a route across multiple backend services via weighting however in this lab you only need the `cart-blue` and `cart-green` services.

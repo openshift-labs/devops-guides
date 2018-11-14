@@ -26,7 +26,7 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 image::devops-envs-create-dev.png[Create Dev Project, width=360]
 
-The Dev deployment project for the Cart service is created now and is ready for the Cart service to be deployed. 
+The Dev deployment project for the Cart service is created now and is ready for the Cart service to be deployed.
 
 image::devops-envs-dev-project.png[Dev Project]
 
@@ -61,7 +61,7 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 image::devops-envs-cart-newapp.png[Deploy Cart Service, width=800]
 
-Click on *advanced options* to review advanced options for setting memory and cpu limits, environment variables, scaling and more when deploying an application. In this lab, similar to most development teams a Maven artifact repository (e.g. Sonatype Nexus and Artifactory) is used for managing Maven artifacts. Add the following environment variable under *Build Configuration* to specify the Maven repository manager URL to be used during the build phase:
+Click on *advanced options* to review advanced options for setting memory and CPU limits, environment variables, scaling and more when deploying an application. In this lab, similar to most development teams a Maven artifact repository (e.g. Sonatype Nexus and Artifactory) is used for managing Maven artifacts. Add the following environment variable under *Build Configuration* to specify the Maven repository manager URL to be used during the build phase:
 
 * Name: `MAVEN_MIRROR_URL`
 * Value: `{{NEXUS_INTERNAL_URL}}/repository/maven-all-public`

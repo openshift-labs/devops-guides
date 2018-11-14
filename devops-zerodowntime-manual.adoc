@@ -4,15 +4,15 @@ In this lab you will get familiar with production deployments without requiring 
 
 #### Background
 
-Although you have automated the build and deployment of the Cart service all the way from development to production, every time the pipeline performs the deployment in production the service is unavailable for the period it takes for the Cart container to start up. This might be acceptable for certain services however an unavailable service for an online shop equalis lost orders and revenue specially during shopping seasons like Christmas.
+Although you have automated the build and deployment of the Cart service all the way from development to production, every time the pipeline performs the deployment in production the service is unavailable for the period it takes for the Cart container to start up. This might be acceptable for certain services however an unavailable service for an online shop equals lost orders and revenue specially during shopping seasons like Christmas.
 
 Zero downtime deployments refers to a number of deployment pattern that allow deploying to production environment during work hours without a need for service windows and without causing any disruption for the live services. Blue-Green and Canary Release are two popular patterns that are often used to achieve zero downtime deployments.
 
-Canary Release refers to deploying a new version of your app into production parallel to the live version and redirectly only a fraction of production traffic to the new version. After verifying that the canary deployment works correctly, incremental more production traffic is switched to the canary version until it serves 100% of the production traffic. Canary Release allows you to test the application directly in the production with subset of users so that in case of failure, only a small user set will be affected.
+Canary Release refers to deploying a new version of your app into production parallel to the live version and redirecting only a fraction of production traffic to the new version. After verifying that the canary deployment works correctly, incremental more production traffic is switched to the canary version until it serves 100% of the production traffic. Canary Release allows you to test the application directly in the production with subset of users so that in case of failure, only a small user set will be affected.
 
 In Blue-Green deployment approach you also have two parallel production environments but at any point in time only one of them is active and receives the production traffic, for example the blue one. When you deploy the new version of the application in production, you deploy into the inactive environment, green in this example, and after ensuring that the new version works correctly in production you switch the router so that all incoming production traffic goes to the green environment, making the blue one idle.
 
-Blue-green deployment also enables you to be able to quickly rollback to the previous version. if anything goes wrong with the new version after the switch, you can switch back the router the blue version. You still need to manage transactions and database changes when deploying new versions of your application however there are other patterns to specifically deal with those issues separately for example depending on your environment and application design, you might be able to feed transactions to both environments so that the blue environment acts as a backup or run the application in read-only mode before doing a switch.
+Blue-green deployment also enables you to be able to quickly rollback to the previous version. If anything goes wrong with the new version after the switch, you can switch back the router the blue version. You still need to manage transactions and database changes when deploying new versions of your application however there are other patterns to specifically deal with those issues separately for example depending on your environment and application design, you might be able to feed transactions to both environments so that the blue environment acts as a backup or run the application in read-only mode before doing a switch.
 
 image::devops-zerodowntime-bluegreen-diagram.png[Blue-Green Deployment]
 
@@ -94,7 +94,7 @@ $ oc create -f ~/cart-blue.yaml
 $ oc create -f ~/cart-green.yaml
 ----
 
-Now that the Cart Blue and Cart Green deployment and services are defined, you can deploy those containers in the the Prod environment. Click on *Applications -> Deployments* and then on *cart-blue*. Deploy the Cart Blue service by clicking on the *Deploy* button. Go back to the list of deployments and click on *cart-green*, and then *Deploy* button to also deploy the Cart Green service.
+Now that the Cart Blue and Cart Green deployment and services are defined, you can deploy those containers in the Prod environment. Click on *Applications -> Deployments* and then on *cart-blue*. Deploy the Cart Blue service by clicking on the *Deploy* button. Go back to the list of deployments and click on *cart-green*, and then *Deploy* button to also deploy the Cart Green service.
 
 The Cart Blue and Green containers will be deployed alongside the previous Cart container.
 
@@ -132,7 +132,7 @@ $ oc get routes
 
 Verify the routes are working using the `curl` command:
 
-CAUTION: Replace the urls with routes in your project
+CAUTION: Replace the URLs with routes in your project
 
 [source,shell]
 ----
@@ -164,9 +164,9 @@ public void applyShippingPromotions(ShoppingCart shoppingCart) {
 
 Notice that the minimum order for free shipping is currently 75$. In order to match a competitor website, you want to change the promotion rules and reduce the minimum to 40$. Click on the pencil icon to open `PromoService.java` in the web-based editor.
 
-image::devops-zerodowntime-gogs-editor.png[Gogs Web Editort]
+image::devops-zerodowntime-gogs-editor.png[Gogs Web Editor]
 
-Change the minium order to 40$. The `PromoService.java` should look like this after the edit:
+Change the minimum order to 40$. The `PromoService.java` should look like this after the edit:
 
 [source,java]
 ----
@@ -199,7 +199,7 @@ $ curl -X POST http://{{CART_GREEN_ROUTE}}/api/cart/FOO/444434/2
 {"cartItemTotal":48.0,"cartItemPromoSavings":0.0,"shippingTotal":0.0,"shippingPromoSavings":-4.99,"cartTotal":52.99,"shoppingCartItemList":[{"price":24.0,"quantity":2,"promoSavings":0.0,"product":{"itemId":"444434","name":"Pebble Smart Watch","desc":"Smart glasses and smart watches are perhaps two of the most exciting developments in recent years. ","price":24.0}}]}
 ----
 
-Notice that the shipping cost is zero since the total order is above the 40$ minimum order. However the change is still not live and invoking the production endpoints for the Cart service should still have the 75$ minimum order. Click on the Web UI route url and add 2 Pebble Smart Watches to your shopping cart. As expected, the shipping cost is not zero.
+Notice that the shipping cost is zero since the total order is above the 40$ minimum order. However the change is still not live and invoking the production endpoints for the Cart service should still have the 75$ minimum order. Click on the Web UI route URL and add 2 Pebble Smart Watches to your shopping cart. As expected, the shipping cost is not zero.
 
 image::devops-zerodowntime-shipping-costs.png[CoolStore Shopping Cart]
 

@@ -1,4 +1,4 @@
-FROM ansibleplaybookbundle/apb-base
+FROM quay.io/openshiftlabs/apb-base:1.2
 
 LABEL "com.redhat.apb.spec"=\
 "dmVyc2lvbjogMS4wCm5hbWU6IGRldm9wcy13b3Jrc2hvcC1hcGIKZGVzY3JpcHRpb246IEFQQiB0\

@@ -5,7 +5,7 @@ vars:
   OPENSHIFT_URL: "OPENSHIFT-MASTER"
   OPENSHIFT_USER: "userXX"
   OPENSHIFT_PASSWORD: "openshift3"
-  OPENSHIFT_DOCS_BASE: "https://docs.openshift.com/container-platform/3.10"
+  OPENSHIFT_DOCS_BASE: "https://docs.openshift.com/container-platform/3.11"
   NEXUS_URL: "http://nexus-lab-infra.192.168.99.100.nip.io"
   NEXUS_INTERNAL_URL: "http://nexus.lab-infra.svc:8081"
   GIT_SERVER_URL: "gogs-lab-infra.192.168.99.100.nip.io"

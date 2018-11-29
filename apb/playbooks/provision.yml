@@ -3,6 +3,7 @@
   gather_facts: false
   connection: local
   vars:
+    master_url: "kubernetes.default"
     openshift_master_url:
     openshift_admin_user: 
     openshift_admin_password: 
@@ -11,7 +12,7 @@
     openshift_user_password: openshift
     project_suffix: "X"
     github_account: openshift-labs
-    github_ref: ocp-3.10
+    github_ref: ocp-3.11
     gogs_gen_user_count: 100
     gogs_gen_user_format: user%d
     gogs_gen_user_format_display: userX
@@ -25,14 +26,14 @@
 
   tasks:    
   - name: login as super user with token
-    shell: "oc login --token={{ openshift_token }} --insecure-skip-tls-verify=true"
+    shell: "oc login {{ master_url }} --token={{ openshift_token }} --insecure-skip-tls-verify=true"
     when:
       - openshift_token is defined
       - openshift_token is not none
       - openshift_token|trim() != ""
 
   - name: login as super user with pwd
-    shell: "oc login -u {{ openshift_admin_user }} -p {{ openshift_admin_password }} --insecure-skip-tls-verify=true"
+    shell: "oc login {{ master_url }} -u {{ openshift_admin_user }} -p {{ openshift_admin_password }} --insecure-skip-tls-verify=true"
     when: >
       openshift_token is not defined or
       openshift_token is none or

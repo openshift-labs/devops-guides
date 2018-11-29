@@ -36,7 +36,7 @@ Install the following template so that you can deploy the production images from
 [source,shell]
 ----
 $ oc project prod-{{PROJECT_SUFFIX}}
-$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/ocp-3.10/openshift/coolstore-deployment-template.yaml 
+$ oc create -f https://raw.githubusercontent.com/openshift-labs/devops-labs/ocp-3.11/openshift/coolstore-deployment-template.yaml 
 ----
 
 You can go ahead and deploy the CoolStore application in production. In the _Prod_ project, click on *Add to project* and *Select from Project*. Choose the *CoolStore Deployments* template and then *Next* and again *Next*.

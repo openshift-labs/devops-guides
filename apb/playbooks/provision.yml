@@ -163,3 +163,10 @@
 
   - name: Create Images in openshift namespace
     command: oc new-app coolstore-builds -p MAVEN_MIRROR_URL=http://nexus.{{ namespace }}.svc.cluster.local:8081/repository/maven-all-public -p GIT_URI=https://github.com/{{ github_account }}/devops-labs.git -p GIT_REF={{ github_ref }} -p BUILD_TAG=prod -n openshift
+
+  # track workshop deployment
+  - import_role:
+      name: workshop_deployment_tracker
+    vars:
+      apps_hostname_suffix: "{{ apps_hostname_suffix }}"
+      workshop_type: devops 

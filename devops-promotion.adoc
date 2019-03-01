@@ -66,7 +66,7 @@ Tag cart:prod set to dev-{{PROJECT_SUFFIX}}/cart@sha256:ee898ec51ab7bbce53ff4142
 
 The above command promotes the `cart:latest` container image which is the latest image build of the Cart service in the _Dev_ environment, to the _Prod_ environment and names it `cart:prod`. As soon as the cart image is promoted to the _Prod_ environment, the Cart container gets automatically deployed. As new Cart service container images are built, the _Prod_ environment remains intact until you promote the new image builds to the _Prod_ environment after sufficient testing.
 
-When the Cart service is ready, click on the Web UI route url and verify that CoolStore online shop is working correctly. If the product list is not displayed correctly, refresh the page a few times.
+When the Cart service is ready, click on the Web UI route URL and verify that CoolStore online shop is working correctly. If the product list is not displayed correctly, refresh the page a few times.
 
 image::devops-intro-coolstore.png[CoolStore Webshop]
 
@@ -85,7 +85,7 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 stage('Promote to Prod') {
   steps {
     timeout(time:15, unit:'MINUTES') {
-        input message: "Approve Promotion to Prod?", ok: "Promote"
+      input message: "Approve Promotion to Prod?", ok: "Promote"
     }
     script {
       openshift.withCluster() {

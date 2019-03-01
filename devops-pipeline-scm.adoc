@@ -1,6 +1,6 @@
 ## Pipeline Definition as Code
 
-In this lab you will get familiar with definine a pipeline as code and manage its versions via a version control system.
+In this lab you will get familiar with defining a pipeline as code and manage its versions via a version control system.
 
 #### Background
 Although it is convenient to embed a Jenkinsfile into an OpenShift Pipeline and edit it directly in the OpenShift Web Console, there is no history of changes made to the pipeline through the UI. Furthermore, switching back and forth between multiple versions of the pipeline becomes challenging with an embedded Jenkinsfile. Therefore, it is generally considered a best practice to create a Jenkinsfile and check it into the source control repository in order to manage its versions and history of changes applied to it.
@@ -21,9 +21,9 @@ CAUTION: Replace `{{PROJECT_SUFFIX}}` with the number provided to you by the ins
 
 [TIP]
 ====
-If you are using Eclipse Che, click on **Import Project...** and then enter the Git url 
-as the `URL` and click on **Import**. Make sure to replace your username and password in the 
-Git url:
+If you are using Eclipse Che, click on **Import Project...** and then enter the Git URL
+as the `URL` and click on **Import**. Make sure to replace your username and password in the
+Git URL:
 
 http://{{GIT_USER}}:{{GIT_PASSWORD}}@{{GIT_SERVER_URL}}/{{GIT_USER}}/cart-service.git
 
@@ -78,7 +78,7 @@ pipeline {
               dc = openshift.selector("dc", "cart")
               dc.rollout().latest()
               timeout(10) {
-                  dc.rollout().status()
+                dc.rollout().status()
               }
             }
           }

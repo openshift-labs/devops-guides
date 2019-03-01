@@ -1,6 +1,6 @@
 ## Creating Custom Jenkins Slave Pods
 
-In this lab you will get familiar with creating custom slave container images for running distributed builds on OpenShfit.
+In this lab you will get familiar with creating custom slave container images for running distributed builds on OpenShift.
 
 #### Background
 
@@ -21,7 +21,7 @@ To facilitate the using of the Kubernetes plug-in, OpenShift Container Platform 
 
 The base image for Jenkins slaves pulls in both required tools (headless Java, the Jenkins JNLP client) and generally useful ones (including git, tar, zip, nss among others) as well as running the slave agent.
 
-The certified Jenkins image provided by OpenShift also provides auto-discovery and auto-configuration of slave images by searching for these in the existing image streams within the project that it is running in. The search specifically looks for image streams that have the label role=jenkins-slave. When it finds an image stream with this label, it generates the corresponding Kubernetes plug-in configuration so you can assign your Jenkins jobs to run in a pod running the container image provided by the image stream.
+The certified Jenkins image provided by OpenShift also provides auto-discovery and auto-configuration of slave images by searching for these in the existing image streams within the project that it is running in. The search specifically looks for image streams that have the label `role=jenkins-slave`. When it finds an image stream with this label, it generates the corresponding Kubernetes plug-in configuration so you can assign your Jenkins jobs to run in a pod running the container image provided by the image stream.
 
 Note that this scanning is only performed once, when the Jenkins master is starting.
 
@@ -70,7 +70,7 @@ $ oc label is/jenkins-slave-gradle-rhel7 role=jenkins-slave
 $ oc annotate is/jenkins-slave-gradle-rhel7 slave-label=gradle
 ----
 
-When Jenkins master starts for the first time, it automatically scans the image registry for slave images and configures them on Jenkins. Since you use an ephemeral Jenkins (without persistent storage) in this lab, restarting Jenkins causes a fresh Jenkins container to be deployed and to run the automatic configuration and discovery at startup to configure the Gradle slave image. When using a persistent Jenkins, all configurations would be kept and be available on the new container as well and therefore the automatic scan would not get triggered to avoid overwriting user configurations in Jenkins. In that case, you can configure the Gradle jenkins slave by adding a *Kubernetes Pod Template* in Jenkins configuration panel.
+When Jenkins master starts for the first time, it automatically scans the image registry for slave images and configures them on Jenkins. Since you use an ephemeral Jenkins (without persistent storage) in this lab, restarting Jenkins causes a fresh Jenkins container to be deployed and to run the automatic configuration and discovery at startup to configure the Gradle slave image. When using a persistent Jenkins, all configurations would be kept and be available on the new container as well and therefore the automatic scan would not get triggered to avoid overwriting user configurations in Jenkins. In that case, you can configure the Gradle Jenkins slave by adding a *Kubernetes Pod Template* in Jenkins configuration panel.
 
 Delete the Jenkins pod so that OpenShift auto-healing capability starts a new Jenkins pod:
 

@@ -1,13 +1,13 @@
 ## Appendix: Environment Info
 
-You find all urls, hostnames, usernames and passwords that are needed during the 
-labs in this page. Note that the urls are also embedded inside each lab instructions.
+You find all URLs, hostnames, usernames and passwords that are needed during the
+labs in this page. Note that the URLs are also embedded inside each lab instructions.
 
 **OPENSHIFT**
 
 Address: {{ OPENSHIFT_URL }} +
 
-Username: `{{ OPENSHIFT_USER }}` + 
+Username: `{{ OPENSHIFT_USER }}` +
 Password: `{{ OPENSHIFT_PASSWORD }}` +
 
 IMPORTANT: Replace `{{ PROJECT_SUFFIX }}` with the id given to you by the instructor
@@ -16,8 +16,8 @@ IMPORTANT: Replace `{{ PROJECT_SUFFIX }}` with the id given to you by the instru
 
 Web: http://{{ GIT_SERVER_URL }}
 
-Username: `{{ GIT_USER }}` + 
-Password: `{{ GIT_PASSWORD }}` + 
+Username: `{{ GIT_USER }}` +
+Password: `{{ GIT_PASSWORD }}` +
 
 **NEXUS MAVEN REPOSITORY**
 

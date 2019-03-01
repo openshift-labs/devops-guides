@@ -52,7 +52,7 @@ pipeline {
               dc = openshift.selector("dc", "cart")
               dc.rollout().latest()
               timeout(10) {
-                  dc.rollout().status()
+                dc.rollout().status()
               }
             }
           }
@@ -100,7 +100,7 @@ pipeline {
     stage('Approve Go Live') {
       steps {
         timeout(time:15, unit:'MINUTES') {
-            input message: "Approve Promotion to Prod?", ok: "Promote"
+          input message: "Approve Promotion to Prod?", ok: "Promote"
         }
         script {
           openshift.withCluster() {

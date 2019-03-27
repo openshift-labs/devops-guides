@@ -9,7 +9,7 @@ Using OpenShift Pipeline, you can store Jenkinsfiles in a Git repository and ref
 
 Although CI/CD is a fairly new in many organizations, teams have been building Continuous Integration flows for a long time and have invested lots of time improving and refining that process. For Java projects, the CI flow generally moves around building the application JAR/WAR/EAR, running the unit-tests suits and integration tests and if successful, releasing the application binaries into a repository manager like Sonatype Nexus and Artifactory. In this lab, you will modify the pipeline in order to extend existing CI processes and build upon the Maven build and test flow that exists in many development teams.
 
-The following diagram shows the pipeline stages. For the sake simplicity, pushing the artifacts to an artifact repository is not included in this pipeline however you can include that using the https://jenkins.io/doc/pipeline/steps/nexus-artifact-uploader/[Nexus Artifact Uploader Plugin] for Sonatype Nexus and https://jenkins.io/doc/pipeline/steps/artifactory/#artifactoryupload-upload-artifacts[Artifactory Plugin] for Artifactory.
+The following diagram shows the pipeline stages. For the sake of simplicity, pushing the artifacts to an artifact repository is not included in this pipeline however you can include that using the https://jenkins.io/doc/pipeline/steps/nexus-artifact-uploader/[Nexus Artifact Uploader Plugin] for Sonatype Nexus and https://jenkins.io/doc/pipeline/steps/artifactory/#artifactoryupload-upload-artifacts[Artifactory Plugin] for Artifactory.
 
 image::devops-pipeline-scm-diagram.png[Pipeline Diagram]
 

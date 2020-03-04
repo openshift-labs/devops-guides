@@ -34,7 +34,7 @@ By default, the current user who created the project is the _admin_ for this pro
 
 image::devops-envs-dev-membership.png[Project Access Control, width=800]
 
-Now, let’s deploy the Spring Boot application, Cart service, into the Dev environment. OpenShift supports deploying containerized apps in three different ways and allows developer to pick the process that is most suitable for their projects:
+Now, let’s deploy the Spring Boot application, Cart service, into the Dev environment. OpenShift supports deploying containerized apps in three different ways and allows developers to pick the process that is most suitable for their projects:
 
 * From application source code
 * From application binary (e.g. app.jar)
